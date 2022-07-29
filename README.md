@@ -4,6 +4,8 @@ A document-based SwiftUI application for viewing and editing EEG data.
 
 # Overview
 
+![Trace Preview](/Media/Preview.png)
+
 View EEG data conveniently on your phone, with the same powerful functions as desktop alternatives. Use a 2-dimensional scalp map visualisation and effortlessly scrub through samples, or plot potentials over time for a graphic solution. Import multi-stream data from CSV or from text, and save and share your EEG data with the new minimal, space-efficient Trace document type, `.trace`.
 
 # Electrode support
