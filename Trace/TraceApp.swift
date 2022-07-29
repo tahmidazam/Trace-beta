@@ -11,7 +11,9 @@ import SwiftUI
 struct TraceApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: TraceDocument()) { file in
-            ContentView(document: file.$document)
+            DocumentView(doc: file.$document)
+                .toolbar(.hidden)
         }
+        
     }
 }
