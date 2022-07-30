@@ -12,6 +12,13 @@ struct ChartView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var doc: TraceDocument
     
+    var stepSize = 100
+    
+    @State var firstIndex: Int = 0
+    @State var lastIndex: Int = 100
+    
+    @State var loading = false
+    
     var body: some View {
         NavigationStack {
             chart
@@ -30,7 +37,7 @@ struct ChartView: View {
             .foregroundStyle(by: .value("Electrode", $0.electrode.symbol))
             .lineStyle(StrokeStyle(lineWidth: 0.5))
         }
-        .chartXScale(domain: 0...maxXScale)
+        .chartXScale(domain: doc.contents.time(at: firstIndex)...doc.contents.time(at: lastIndex))
         .chartLegend(.hidden)
         .padding()
     }
@@ -41,6 +48,18 @@ struct ChartView: View {
     var toolbar: some ToolbarContent {
         Group {
             ToolbarItem(placement: .confirmationAction, content: { doneButton })
+            
+            ToolbarItemGroup(placement: .bottomBar, content: {
+                stepBackward1Button
+                
+                Spacer()
+                
+                Text("Loading...").opacity(loading ? 1 : 0)
+                
+                Spacer()
+                
+                stepForward1Button
+            })
         }
     }
     
@@ -50,6 +69,25 @@ struct ChartView: View {
         } label: {
             Text("Done")
         }
+    }
+    var stepBackward1Button: some View {
+        Button(action: {
+            firstIndex -= stepSize
+            lastIndex -= stepSize
+        }) {
+            Image(systemName: "backward.frame.fill")
+        }.disabled(firstIndex - stepSize < 0)
+    }
+    var stepForward1Button: some View {
+        Button(action: {
+            loading = true
+            firstIndex += stepSize
+            lastIndex += stepSize
+            loading = false
+        }) {
+            Image(systemName: "forward.frame.fill")
+        }
+        .disabled(firstIndex + stepSize > doc.contents.sampleCount ?? 0)
     }
 }
 

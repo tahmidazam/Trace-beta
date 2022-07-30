@@ -13,7 +13,6 @@ struct ScalpMapView: View {
     
     @State var index = 0
     @State var playing = false
-    @State var timer: Timer? = nil
     @State var timeProportion: Double = 0.0
     
     var body: some View {
@@ -44,6 +43,7 @@ struct ScalpMapView: View {
                             timeProportion = Double(index + 1) / Double(sampleCount)
                         }
                     }
+                    .disabled(playing)
             }
             .padding()
             .navigationTitle("Scalp Map")
@@ -149,19 +149,9 @@ struct ScalpMapView: View {
         Button(action: {
             if playing {
                 playing = false
-                timer?.invalidate()
-                timer = nil
             } else {
                 playing = true
-                
-                timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true, block: { tempTimer in
-                    let step = 1
-                    if index + step <= doc.contents.sampleCount ?? 0 {
-                        index += step
-                    } else {
-                        index = 0
-                    }
-                })
+                step()
             }
         }) {
             ZStack {
@@ -174,6 +164,20 @@ struct ScalpMapView: View {
         }
     }
     
+    func step() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + (1 / doc.contents.sampleRate)) {
+            let stepSize = 1
+            if index + stepSize <= doc.contents.sampleCount ?? 0 {
+                index += stepSize
+            } else {
+                index = 0
+            }
+            
+            if playing {
+                step()
+            }
+        }
+    }
     func electrodePoint(stream: Stream, size: CGSize) -> CGPoint? {
         guard let location = Electrode.location(from: stream.electrode) else {
             return nil
