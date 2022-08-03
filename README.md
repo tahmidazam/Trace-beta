@@ -1,6 +1,6 @@
 # Trace
 
-A document-based SwiftUI application for viewing and editing EEG data.
+A document-based SwiftUI application for viewing and editing EEG data, aimed at making software for viewing brain imaging data more accessible.
 
 # Overview
 
