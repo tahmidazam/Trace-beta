@@ -12,6 +12,7 @@ struct DocumentView: View {
     
     @State var searchText: String = ""
     @State var sheet: DocumentViewSheet? = nil
+    @State var fullScreenCover: DocumentViewFullScreenCover? = nil
     @State var alert: StreamsViewAlert? = nil
     @State var showCSVFileImporter = false
     
@@ -29,11 +30,15 @@ struct DocumentView: View {
             }
         }
     }
-    
     enum DocumentViewSheet: Identifiable {
         var id: UUID { UUID() }
         
-        case newStreamView, scalpMapView, chartView, documentPreferencesView
+        case newStreamView, documentPreferencesView
+    }
+    enum DocumentViewFullScreenCover: Identifiable {
+        var id: UUID { UUID() }
+        
+        case scalpMapView, chartView
     }
     
     var body: some View {
@@ -49,14 +54,14 @@ struct DocumentView: View {
             .toolbar(content: { toolbarView })
             .sheet(item: $sheet, content: { sheet in
                 switch sheet {
-                case .newStreamView:
-                    NewStreamView(document: $doc)
-                case .scalpMapView:
-                    ScalpMapView(doc: $doc)
-                case .chartView:
-                    ChartView(doc: $doc)
-                case .documentPreferencesView:
-                    DocumentPreferencesView(doc: $doc)
+                case .newStreamView: NewStreamView(document: $doc)
+                case .documentPreferencesView: DocumentPreferencesView(doc: $doc)
+                }
+            })
+            .fullScreenCover(item: $fullScreenCover, content: { fullScreenCover in
+                switch fullScreenCover {
+                case .chartView: ChartView(doc: $doc)
+                case .scalpMapView: ScalpMapView(doc: $doc)
                 }
             })
             .alert(item: $alert, content: { alert in alert.alert })
@@ -186,14 +191,14 @@ struct DocumentView: View {
     }
     var openScalpMapButton: some View {
         Button {
-            sheet = .scalpMapView
+            fullScreenCover = .scalpMapView
         } label: {
             Label("Open scalp map", systemImage: "circle.dashed")
         }
     }
     var openChartButton: some View {
         Button {
-            sheet = .chartView
+            fullScreenCover = .chartView
         } label: {
             Label("Open chart", systemImage: "chart.xyaxis.line")
         }

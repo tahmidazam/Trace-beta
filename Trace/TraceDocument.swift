@@ -176,18 +176,30 @@ struct TraceDocumentContents: Identifiable, Codable {
     ///   - stream: The stream to map.
     ///   - sampleRate: The sample rate of the stream.
     /// - Returns: A chart-parsable stream.
-    static func sampleDataPoints(from streams: [Stream], sampleRate: Double) -> [TraceDocumentContents.SampleDataPoint] {
+    static func sampleDataPoints(from streams: [Stream], sampleRate: Double, spliced: ClosedRange<Int>? = nil) -> [TraceDocumentContents.SampleDataPoint] {
         var data: [TraceDocumentContents.SampleDataPoint] = []
         
         for stream in streams {
-            for sampleIndex in 0..<stream.samples.count {
-                let dataPoint = TraceDocumentContents.SampleDataPoint(
-                    electrode: stream.electrode,
-                    timestamp: (1 / sampleRate) * Double(sampleIndex),
-                    potential: stream.samples[sampleIndex]
-                )
-                
-                data.append(dataPoint)
+            if spliced != nil {
+                for sampleIndex in spliced!.lowerBound..<min(stream.samples.count, spliced!.upperBound) {
+                    let dataPoint = TraceDocumentContents.SampleDataPoint(
+                        electrode: stream.electrode,
+                        timestamp: (1 / sampleRate) * Double(sampleIndex),
+                        potential: stream.samples[sampleIndex]
+                    )
+                    
+                    data.append(dataPoint)
+                }
+            } else {
+                for sampleIndex in 0..<stream.samples.count {
+                    let dataPoint = TraceDocumentContents.SampleDataPoint(
+                        electrode: stream.electrode,
+                        timestamp: (1 / sampleRate) * Double(sampleIndex),
+                        potential: stream.samples[sampleIndex]
+                    )
+                    
+                    data.append(dataPoint)
+                }
             }
         }
         

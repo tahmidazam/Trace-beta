@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct StreamDetailView: View {
     @Binding var doc: TraceDocument
@@ -13,6 +14,16 @@ struct StreamDetailView: View {
     @State var stream: Stream
     
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        if let minPotential = doc.contents.minPotential, let maxPotential = doc.contents.maxPotential {
+            Chart(Stream.sampleDataPoints(from: stream.samples, sampleRate: doc.contents.sampleRate), id: \.self) { point in
+                LineMark(
+                    x: .value("time/s", point.timestamp),
+                    y: .value("potential/mV", point.potential)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 0.5))
+            }
+            .chartYScale(domain: minPotential...maxPotential)
+            .padding()
+        }
     }
 }
