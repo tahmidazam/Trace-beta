@@ -116,11 +116,12 @@ struct ChartView: View {
     
     @State var windowSize: Int = 100
     @State var windowStart: Int = 0
-    var window: ClosedRange<Int> {
-        windowStart...(windowStart + windowSize)
+    
+    var window: Range<Int> {
+        windowStart..<(windowStart + windowSize)
     }
-    var timeWindow: ClosedRange<Double> {
-        doc.contents.time(at: window.lowerBound)...doc.contents.time(at: window.upperBound)
+    var timeWindow: Range<Double> {
+        doc.contents.time(at: window.lowerBound)..<doc.contents.time(at: window.upperBound)
     }
     
     var points: [TraceDocumentContents.SampleDataPoint] {
@@ -143,15 +144,23 @@ struct ChartView: View {
             state = value.translation
         }
     }
-    
+    var xValues: [Double] {
+        stride(from: timeWindow.lowerBound, to: timeWindow.upperBound, by: (timeWindow.upperBound - timeWindow.lowerBound) / 5).map { $0 }
+    }
     var body: some View {
         NavigationStack {
             ZStack {
                 if let minPotential = doc.contents.minPotential, let maxPotential = doc.contents.maxPotential {
                     chart
                         .chartYScale(domain: minPotential...maxPotential)
-                        .chartXScale(domain: timeWindow)
-                        .chartLegend(position: .trailing)
+                        .chartXScale(domain: ClosedRange(uncheckedBounds: (lower: timeWindow.lowerBound, upper: timeWindow.upperBound)))
+                        .chartXAxis {
+                            AxisMarks(values: xValues)
+                        }
+                        .chartYAxis(content: {
+                            AxisMarks(position: .leading)
+                        })
+                        .chartLegend(position: .leading)
                         .scaleEffect(magnifyBy)
                         .offset(dragAmount)
                         .simultaneousGesture(drag)
@@ -163,6 +172,7 @@ struct ChartView: View {
             }
             .task {
                 selectedStreams = doc.contents.streams
+                print(xValues)
             }
             .navigationTitle("Plotting \(selectedStreams.count) of \(doc.contents.streams.count)")
             .navigationBarTitleDisplayMode(.inline)
@@ -179,12 +189,17 @@ struct ChartView: View {
                     Spacer()
                     
                     VStack {
-                        Text("\(timeWindow.lowerBound.format()) s to \(timeWindow.upperBound.format()) s")
-                            .font(.headline)
+                        if let duration = doc.contents.duration {
+                            Text("\(timeWindow.lowerBound.format()) s to \(min(timeWindow.upperBound, duration).format()) s of \(duration.format()) s")
+                                .font(.headline)
+                        }
                         
-                        Text("Sample \(window.lowerBound + 1) to \(window.upperBound) of \(doc.contents.sampleCount ?? 0)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        
+                        if let sampleCount = doc.contents.sampleCount {
+                            Text("Sample \(window.lowerBound + 1) to \(min(window.upperBound, sampleCount)) of \(sampleCount)")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     
                     Spacer()
@@ -229,38 +244,62 @@ struct ChartView: View {
         .disabled(windowStart + windowSize > doc.contents.sampleCount ?? 0)
     }
     var prefixes: [Electrode.Prefix] {
-        Array(Set(doc.contents.streams.map(\.electrode.prefix)))
+        Array(Set(doc.contents.streams.map(\.electrode.prefix))).sorted { elementA, elementB in
+            return elementA.rawValue < elementB.rawValue
+        }
     }
     var streamSelector: some View {
         Menu {
             Section {
-                Button("Select all") { selectedStreams = doc.contents.streams }
-                Button("Deselect all") { selectedStreams = [] }
+                Button {
+                    windowSize += 100
+                } label: {
+                    Label("Increase window size", systemImage: "plus")
+                }
+                .disabled(windowSize + 100 > 1000)
+                
+                Button {
+                    windowSize -= 100
+                } label: {
+                    Label("Decrease window size", systemImage: "minus")
+                }
+                .disabled(windowSize - 100 < 100)
             }
             
-            ForEach(prefixes, id: \.self) { pre in
-                Section {
-                    ForEach(doc.contents.streams.filter { stream in return stream.electrode.prefix == pre }, id: \.self) { stream in
-                        Button {
-                            if selectedStreams.contains(stream) {
-                                selectedStreams.removeAll(where: { $0.id == stream.id })
-                            } else {
-                                selectedStreams.append(stream)
-                            }
-                        } label: {
-                            Label {
-                                Text(stream.electrode.symbol)
-                            } icon: {
-                                if selectedStreams.contains(stream) {
-                                    Image(systemName: "checkmark")
+            Section {
+                Menu {
+                    Section {
+                        Button("Select all") { selectedStreams = doc.contents.streams }
+                        Button("Deselect all") { selectedStreams = [] }
+                    }
+                    
+                    ForEach(prefixes, id: \.self) { pre in
+                        Section {
+                            ForEach(Stream.sortByElectrode(doc.contents.streams.filter { stream in return stream.electrode.prefix == pre }), id: \.self) { stream in
+                                Button {
+                                    if selectedStreams.contains(stream) {
+                                        selectedStreams.removeAll(where: { $0.id == stream.id })
+                                    } else {
+                                        selectedStreams.append(stream)
+                                    }
+                                } label: {
+                                    Label {
+                                        Text(stream.electrode.symbol)
+                                    } icon: {
+                                        if selectedStreams.contains(stream) {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
+                } label: {
+                    Label("Selected streams", systemImage: "list.bullet")
                 }
             }
         } label: {
-            Label("Select streams", systemImage: "list.bullet")
+            Label("View options", systemImage: "ellipsis.circle")
         }
 
     }

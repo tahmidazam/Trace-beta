@@ -15,6 +15,8 @@ struct ScalpMapView: View {
     @State var playing = false
     @State var timeProportion: Double = 0.0
     
+    @State var selectedStreams: [Stream] = []
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -46,21 +48,18 @@ struct ScalpMapView: View {
                     .disabled(playing)
             }
             .padding()
-            .navigationTitle("Scalp Map")
+            .navigationTitle("Rendering \(selectedStreams.count) of \(doc.contents.streams.count)")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Stream.self, destination: { stream in StreamDetailView(doc: $doc, stream: stream) })
             .toolbar(content: { toolbar })
-        }
-    }
-    
-    var streamsWithLocations: [Stream] {
-        doc.contents.streams.filter { stream in
-            Electrode.location(from: stream.electrode) != nil
+            .task {
+                selectedStreams = doc.contents.streams
+            }
         }
     }
     
     var time: String {
-        "\(String(format: "%.3f", doc.contents.time(at: index)))s"
+        "\(doc.contents.time(at: index).format()) s of \(doc.contents.duration?.format() ?? "") s"
     }
     var sampleInfo: String? {
         guard let count = doc.contents.streams.first?.samples.count else {
@@ -72,7 +71,7 @@ struct ScalpMapView: View {
     var visualisation: some View {
         GeometryReader { proxy in
             Canvas { context, size in
-                for stream in doc.contents.streams {
+                for stream in selectedStreams {
                     if let sector = Electrode.sector(stream: stream, size: proxy.size),
                        let min = doc.contents.minPotential,
                        let max = doc.contents.maxPotential {
@@ -81,7 +80,7 @@ struct ScalpMapView: View {
                 }
             }
             
-            ForEach(streamsWithLocations) { stream in
+            ForEach(selectedStreams) { stream in
                 NavigationLink(value: stream) {
                     Text(stream.electrode.symbol)
                         .font(.caption.bold())
@@ -105,6 +104,15 @@ struct ScalpMapView: View {
                 stepForward10Button
                 
                 Spacer()
+            }
+            
+            ToolbarItem(placement: .navigationBarLeading) {
+                streamSelector
+                    .onChange(of: selectedStreams) { newValue in
+                        selectedStreams = newValue.filter { stream in
+                            Electrode.location(from: stream.electrode) != nil
+                        }
+                    }
             }
         }
     }
@@ -184,6 +192,43 @@ struct ScalpMapView: View {
         }
         
         return location.cgPoint(in: size)
+    }
+    var prefixes: [Electrode.Prefix] {
+        Array(Set(doc.contents.streams.map(\.electrode.prefix))).sorted { elementA, elementB in
+            return elementA.rawValue < elementB.rawValue
+        }
+    }
+    var streamSelector: some View {
+        Menu {
+            Section {
+                Button("Select all") { selectedStreams = doc.contents.streams }
+                Button("Deselect all") { selectedStreams = [] }
+            }
+            
+            ForEach(prefixes, id: \.self) { pre in
+                Section {
+                    ForEach(Stream.sortByElectrode(doc.contents.streams.filter { stream in return stream.electrode.prefix == pre }), id: \.self) { stream in
+                        Button {
+                            if selectedStreams.contains(stream) {
+                                selectedStreams.removeAll(where: { $0.id == stream.id })
+                            } else {
+                                selectedStreams.append(stream)
+                            }
+                        } label: {
+                            Label {
+                                Text(stream.electrode.symbol)
+                            } icon: {
+                                if selectedStreams.contains(stream) {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } label: {
+            Label("Select streams", systemImage: "list.bullet")
+        }
     }
 }
 

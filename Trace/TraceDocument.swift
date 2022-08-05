@@ -176,7 +176,7 @@ struct TraceDocumentContents: Identifiable, Codable {
     ///   - stream: The stream to map.
     ///   - sampleRate: The sample rate of the stream.
     /// - Returns: A chart-parsable stream.
-    static func sampleDataPoints(from streams: [Stream], sampleRate: Double, spliced: ClosedRange<Int>? = nil) -> [TraceDocumentContents.SampleDataPoint] {
+    static func sampleDataPoints(from streams: [Stream], sampleRate: Double, spliced: Range<Int>? = nil) -> [TraceDocumentContents.SampleDataPoint] {
         var data: [TraceDocumentContents.SampleDataPoint] = []
         
         for stream in streams {
@@ -285,6 +285,16 @@ struct Stream: Identifiable, Codable, Hashable {
             let prop: Double = (value / min) * 100
             
             return Color(uiColor: negativeColors.intermediate(percentage: prop))
+        }
+    }
+    
+    static func sortByElectrode(_ streams: [Stream]) -> [Stream] {
+        streams.sorted { streamA, streamB in
+            guard streamA.electrode.prefix == streamB.electrode.prefix else {
+                return streamA.electrode.suffix > streamB.electrode.suffix
+            }
+            
+            return streamA.electrode.prefix.rawValue > streamB.electrode.prefix.rawValue
         }
     }
 }
@@ -467,8 +477,8 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
         case .frontal:
             switch stream.electrode.suffix {
             case 0: return path(size: size, lR: 3 / 7, sR: 1 / 7, sA: 0.9375, eA: 0.0625)
-            case 3: return path(size: size, lR: 3 / 7, sR: 1 / 7, sA: 0.0625, eA: 0.1875)
-            case 4: return path(size: size, lR: 3 / 7, sR: 1 / 7, sA: 0.8125, eA: 0.9375)
+            case 3: return path(size: size, lR: 3 / 7, sR: 1 / 7, sA: 0.8125, eA: 0.9375)
+            case 4: return path(size: size, lR: 3 / 7, sR: 1 / 7, sA: 0.0625, eA: 0.1875)
             case 7: return path(size: size, lR: 5 / 7, sR: 3 / 7, sA: 0.8, eA: 0.9)
             case 8: return path(size: size, lR: 5 / 7, sR: 3 / 7, sA: 0.1, eA: 0.2)
             default: return nil
