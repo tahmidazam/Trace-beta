@@ -141,6 +141,12 @@ struct TraceDocumentContents: Identifiable, Codable {
         .min()
     }
     
+    var prefixes: [Electrode.Prefix] {
+        Array(Set(streams.map(\.electrode.prefix))).sorted { elementA, elementB in
+            return elementA.rawValue < elementB.rawValue
+        }
+    }
+    
     /// Converts a stream index to a time value, in seconds, s.
     /// - Parameter index: The index to convert.
     /// - Returns: The time value, in seconds, s.
@@ -342,6 +348,20 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
     /// The index associated with the electrode position, with a range from 0 to 8 inclusive.
     var suffix: Int
     
+    var generalArea: GeneralArea {
+        if suffix == 0 {
+            return .central
+        } else if suffix.quotientAndRemainder(dividingBy: 2).remainder == 1 {
+            return .left
+        } else {
+            return .right
+        }
+    }
+    
+    enum GeneralArea: String {
+        case left, central, right
+    }
+    
     /// An enumeration for all the lobes/areas of the brain.
     enum Prefix: String, Codable, CaseIterable {
         case prefrontal, frontal, temporal, parietal, occipital, central, mastoid
@@ -369,7 +389,7 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
     }
     /// A prose description of the location of the electrode on the scalp, including the side of the brain, as well as the lobe/area.
     var locationDescription: String {
-        "\(self.suffix.side) \(self.prefix.rawValue)"
+        "\(self.generalArea) \(self.prefix.rawValue)"
     }
     
     /// Turns an electrode symbol into an electrode instance.
@@ -553,18 +573,6 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
             case 2: return path(size: size, lR: 7 / 7, sR: 5 / 7, sA: 0.225, eA: 0.275)
             default: return nil
             }
-        }
-    }
-}
-
-extension Int {
-    var side: String {
-        if self == 0 {
-            return "central"
-        } else if self.quotientAndRemainder(dividingBy: 2).remainder == 1 {
-            return "left"
-        } else {
-            return "right"
         }
     }
 }

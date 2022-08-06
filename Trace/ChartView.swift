@@ -143,11 +143,6 @@ struct ChartView: View {
         }
         .disabled(windowStart + windowSize > doc.contents.sampleCount ?? 0)
     }
-    var prefixes: [Electrode.Prefix] {
-        Array(Set(doc.contents.streams.map(\.electrode.prefix))).sorted { elementA, elementB in
-            return elementA.rawValue < elementB.rawValue
-        }
-    }
     var streamSelector: some View {
         Menu {
             Section {
@@ -173,7 +168,7 @@ struct ChartView: View {
                         Button("Deselect all") { selectedStreams = [] }
                     }
                     
-                    ForEach(prefixes, id: \.self) { pre in
+                    ForEach(doc.contents.prefixes, id: \.self) { pre in
                         Section {
                             ForEach(Stream.sortByElectrode(doc.contents.streams.filter { stream in return stream.electrode.prefix == pre }), id: \.self) { stream in
                                 Button {

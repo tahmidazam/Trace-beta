@@ -11,6 +11,7 @@ struct DocumentView: View {
     @Binding var doc: TraceDocument
     
     @State var searchText: String = ""
+    
     @State var sheet: DocumentViewSheet? = nil
     @State var fullScreenCover: DocumentViewFullScreenCover? = nil
     @State var alert: StreamsViewAlert? = nil
@@ -44,10 +45,13 @@ struct DocumentView: View {
     var body: some View {
         NavigationStack {
             List {
-                streamListContent
+                if isSearching {
+                    searchResultsListContent
+                } else {
+                    streamListContent
+                }
             }
             .listStyle(.plain)
-            .navigationTitle(navigationTitleText)
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Stream.self, destination: { stream in StreamDetailView(doc: $doc, stream: stream) })
             .searchable(text: $searchText, prompt: "Find a stream", suggestions: { suggestionsView })
@@ -76,36 +80,63 @@ struct DocumentView: View {
         }
     }
     
-    var navigationTitleText: String {
+    var searchResultsListContent: some View {
+        ForEach(searchResults) { stream in
+            NavigationLink(value: stream) {
+                Label {
+                    Text(stream.electrode.symbol)
+                } icon: {
+                    switch stream.electrode.generalArea {
+                    case .left: Image(systemName: "circle.lefthalf.filled")
+                    case .central: Image(systemName: "circle.and.line.horizontal").rotationEffect(.degrees(90))
+                    case .right: Image(systemName: "circle.righthalf.filled")
+                    }
+                }
+            }
+        }
+    }
+    var listHeader: some View {
         let count = doc.contents.streams.count
+        let string = count == 0 ? "" : "\(count) stream\(count == 1 ? "" : "s")"
         
-        return count == 0 ? "" : "\(count) stream\(count == 1 ? "" : "s")"
+        return Text(string)
     }
     var searchSuggestions: [String] {
         Array(Set(doc.contents.streams.map { stream in
             return stream.electrode.prefix.rawValue
         }))
     }
-    var streamsToDisplay: [Stream] {
-        if searchText == "" {
-            return doc.contents.streams
-        } else {
-            return doc.contents.streams.filter { stream in
-                stream.electrode.locationDescription.contains(searchText.lowercased()) || stream.electrode.symbol.contains(searchText.lowercased())
-            }
+    var searchResults: [Stream] {
+        return doc.contents.streams.filter { stream in
+            stream.electrode.locationDescription.contains(searchText.lowercased()) || stream.electrode.symbol.contains(searchText.lowercased())
         }
+    }
+    var isSearching: Bool {
+        return !searchText.isEmpty
     }
     
     var streamListContent: some View {
-        ForEach(streamsToDisplay) { stream in
-            NavigationLink(value: stream) {
-                VStack(alignment: .leading) {
-                    Text(stream.electrode.symbol)
-                    
-                    Text(stream.electrode.locationDescription)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+        ForEach(doc.contents.prefixes, id: \.self) { pre in
+            Section {
+                ForEach(
+                    doc.contents.streams.filter { stream in stream.electrode.prefix == pre }.sorted(by: { a, b in
+                        a.electrode.suffix > b.electrode.suffix
+                    })
+                ) { stream in
+                    NavigationLink(value: stream) {
+                        Label {
+                            Text(stream.electrode.symbol)
+                        } icon: {
+                            switch stream.electrode.generalArea {
+                            case .left: Image(systemName: "circle.lefthalf.filled")
+                            case .central: Image(systemName: "circle.and.line.horizontal").rotationEffect(.degrees(90))
+                            case .right: Image(systemName: "circle.righthalf.filled")
+                            }
+                        }
+                    }
                 }
+            } header: {
+                Text(pre.rawValue)
             }
         }
     }
@@ -129,7 +160,7 @@ struct DocumentView: View {
         Group {
             ToolbarItem(placement: .navigationBarLeading, content: { closeFileButton })
             
-            ToolbarItemGroup(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
                 newStreamButton
                 
                 openDocumentPreferencesButton
