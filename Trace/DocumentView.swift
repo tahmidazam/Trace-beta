@@ -8,15 +8,47 @@
 import SwiftUI
 
 struct DocumentView: View {
+    // MARK: ARGUMENTS
+    /// The document to display.
     @Binding var doc: TraceDocument
     
+    ///  The search bar text field's text.
     @State var searchText: String = ""
     
+    // MARK: MODALS AND ALERTS
+    /// The sheet currently being presented, nil if a sheet is not being presented.
     @State var sheet: DocumentViewSheet? = nil
+    /// The full screen cover currently being presented, nil if a full screen cover is not being presented.
     @State var fullScreenCover: DocumentViewFullScreenCover? = nil
+    /// The alert currently being presented, nil if an alert is not being presented.
     @State var alert: StreamsViewAlert? = nil
+    /// True if the file importer modal is being presented, false if not.
     @State var showCSVFileImporter = false
     
+    // MARK: COMPUTED PROPERTIES
+    
+    /// The search suggestions to display.
+    var searchSuggestions: [String] {
+        Array(Set(doc.contents.streams.map { stream in
+            return stream.electrode.prefix.rawValue
+        }))
+    }
+    /// The search results.
+    var searchResults: [Stream] {
+        return doc.contents.streams.filter { stream in
+            stream.electrode.locationDescription.contains(searchText.lowercased()) || stream.electrode.symbol.contains(searchText.lowercased())
+        }
+    }
+    /// Describes the search state. True if the search field is not empty.
+    var isSearching: Bool {
+        return !searchText.isEmpty
+    }
+    var documentIsEmpty: Bool {
+        doc.contents.streams.isEmpty
+    }
+    
+    // MARK: ENUMERATIONS
+    /// The document view's alerts.
     enum StreamsViewAlert: Identifiable {
         var id: UUID { UUID() }
         
@@ -31,27 +63,37 @@ struct DocumentView: View {
             }
         }
     }
+    /// The document view's sheets.
     enum DocumentViewSheet: Identifiable {
         var id: UUID { UUID() }
         
         case newStreamView, documentPreferencesView
     }
+    /// The document view's full screen covers.
     enum DocumentViewFullScreenCover: Identifiable {
         var id: UUID { UUID() }
         
         case scalpMapView, chartView
     }
     
+    // MARK: VIEW BODY
+    
     var body: some View {
         NavigationStack {
-            List {
-                if isSearching {
-                    searchResultsListContent
+            Group {
+                if documentIsEmpty {
+                    documentOnboarding
                 } else {
-                    streamListContent
+                    List {
+                        if isSearching {
+                            searchResultsListContent
+                        } else {
+                            streamListContent
+                        }
+                    }
+                    .listStyle(.plain)
                 }
             }
-            .listStyle(.plain)
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Stream.self, destination: { stream in StreamDetailView(doc: $doc, stream: stream) })
             .searchable(text: $searchText, prompt: "Find a stream", suggestions: { suggestionsView })
@@ -80,11 +122,15 @@ struct DocumentView: View {
         }
     }
     
+    // MARK: VIEW BODY COMPONENTS - SUBVIEWS
+    
+    /// Content for the list with search results: a list of streams relevant to the ``searchText``, computed by ``searchResults``.
     var searchResultsListContent: some View {
         ForEach(searchResults) { stream in
             NavigationLink(value: stream) {
                 Label {
                     Text(stream.electrode.symbol)
+                        .font(.system(.body, design: .monospaced))
                 } icon: {
                     switch stream.electrode.generalArea {
                     case .left: Image(systemName: "circle.lefthalf.filled")
@@ -95,37 +141,26 @@ struct DocumentView: View {
             }
         }
     }
-    var listHeader: some View {
+    /// Formatted count of the streams in the ``doc``.
+    var streamCount: String {
         let count = doc.contents.streams.count
         let string = count == 0 ? "" : "\(count) stream\(count == 1 ? "" : "s")"
         
-        return Text(string)
+        return string
     }
-    var searchSuggestions: [String] {
-        Array(Set(doc.contents.streams.map { stream in
-            return stream.electrode.prefix.rawValue
-        }))
-    }
-    var searchResults: [Stream] {
-        return doc.contents.streams.filter { stream in
-            stream.electrode.locationDescription.contains(searchText.lowercased()) || stream.electrode.symbol.contains(searchText.lowercased())
-        }
-    }
-    var isSearching: Bool {
-        return !searchText.isEmpty
-    }
-    
+    /// Content for the document view displayed when ``isSearching`` is false: list of all streams, sectioned by ``Electrode.Prefix``, and sorted by ``Electrode.suffix`` within those sections.
     var streamListContent: some View {
         ForEach(doc.contents.prefixes, id: \.self) { pre in
             Section {
-                ForEach(
-                    doc.contents.streams.filter { stream in stream.electrode.prefix == pre }.sorted(by: { a, b in
-                        a.electrode.suffix > b.electrode.suffix
-                    })
-                ) { stream in
+                let streams = doc.contents.streams.filter { stream in stream.electrode.prefix == pre }.sorted(by: { a, b in
+                    a.electrode.suffix < b.electrode.suffix
+                })
+                
+                ForEach(streams) { stream in
                     NavigationLink(value: stream) {
                         Label {
                             Text(stream.electrode.symbol)
+                                .font(.system(.body, design: .monospaced))
                         } icon: {
                             switch stream.electrode.generalArea {
                             case .left: Image(systemName: "circle.lefthalf.filled")
@@ -135,11 +170,19 @@ struct DocumentView: View {
                         }
                     }
                 }
+                .onDelete { indexSet in
+                    let indexedStream = streams[indexSet.first!]
+                    
+                    doc.contents.streams.removeAll { stream in
+                        stream.id == indexedStream.id
+                    }
+                }
             } header: {
                 Text(pre.rawValue)
             }
         }
     }
+    /// Content for search suggestions, displayed when searching.
     var suggestionsView: some View {
         Group {
             if searchText == "" {
@@ -156,33 +199,37 @@ struct DocumentView: View {
             }
         }
     }
+    /// The toolbar of the view.
     var toolbarView: some ToolbarContent {
         Group {
             ToolbarItem(placement: .navigationBarLeading, content: { closeFileButton })
             
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                newStreamButton
+            if !documentIsEmpty {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    newStreamButton
+                    
+                    openDocumentPreferencesButton
+                }
                 
-                openDocumentPreferencesButton
-            }
-            
-            ToolbarItemGroup(placement: .bottomBar) {
-                openScalpMapButton
-                
-                Spacer()
-                
-                timingSummaryView
-                
-                Spacer()
-                
-                openChartButton
+                ToolbarItemGroup(placement: .bottomBar) {
+                    openScalpMapButton
+                    
+                    Spacer()
+                    
+                    documentSummary
+                    
+                    Spacer()
+                    
+                    openChartButton
+                }
             }
         }
     }
-    var timingSummaryView: some View {
+    /// Summary of document details, including the stream count, duration, sample count and sample rate.
+    var documentSummary: some View {
         VStack {
             if let duration = doc.contents.duration {
-                Text("\(duration.format()) s")
+                Text("\(streamCount), \(duration.format()) s")
                     .font(.headline)
             }
             
@@ -193,7 +240,44 @@ struct DocumentView: View {
             }
         }
     }
+    /// Onboarding steps to construct a trace project, displayed when the document is empty.
+    var documentOnboarding: some View {
+        VStack {
+            Text("Get started by importing EEG data into your Trace project.")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.title3.bold())
+                .multilineTextAlignment(.leading)
+            
+            Text("Import multi-stream data from \(Image(systemName: "rectangle.split.3x3")) CSV, or stream-by-stream from pasted \(Image(systemName: "text.alignleft")) text.")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .font(.subheadline)
+                .multilineTextAlignment(.leading)
+                .padding(.top)
+
+            Spacer()
+            
+            Text("In CSV files, each column represents a stream, with the first cell corresponding to the electrode label, and the rest of the cells form the array of samples. Each column (i.e., each stream) must have the same number of samples, and the electrode label must satisfy the format specified above.\n\nPasted text must be newline-separated values, and electrode information is inputted separately.\n\nInformation about import file requirements, electrode support and general support can be found on the [GitHub page](https://github.com/tahmidazam/Trace).")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            VStack {
+                addFromCSVButton
+                    .buttonStyle(.borderedProminent)
+                
+                addFromTextButton
+                    .frame(maxWidth: .infinity)
+                    .buttonStyle(.bordered)
+            }
+            .controlSize(.large)
+            .padding(.top)
+        }
+        .padding()
+    }
     
+    // MARK: VIEW BODY COMPONENTS - BUTTONS
+    
+    /// Button for closing the file and returning to the file picker for the Trace app.
     var closeFileButton: some View {
         Button {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
@@ -204,6 +288,7 @@ struct DocumentView: View {
             Label("Close file", systemImage: "chevron.left")
         }
     }
+    /// Button for adding a new stream.
     var newStreamButton: some View {
         Menu {
             addFromCSVButton
@@ -213,6 +298,7 @@ struct DocumentView: View {
         }
 
     }
+    /// Button for opening the document preferences sheet.
     var openDocumentPreferencesButton: some View {
         Button {
             sheet = .documentPreferencesView
@@ -220,6 +306,7 @@ struct DocumentView: View {
             Label("Document preferences", systemImage: "ellipsis.circle")
         }
     }
+    /// Button for opening the scalp map full screen cover.
     var openScalpMapButton: some View {
         Button {
             fullScreenCover = .scalpMapView
@@ -227,6 +314,7 @@ struct DocumentView: View {
             Label("Open scalp map", systemImage: "circle.dashed")
         }
     }
+    /// Button for opening the chart full screen cover.
     var openChartButton: some View {
         Button {
             fullScreenCover = .chartView
@@ -234,22 +322,29 @@ struct DocumentView: View {
             Label("Open chart", systemImage: "chart.xyaxis.line")
         }
     }
-    
+    /// Button for importing data from CSV.
     var addFromCSVButton: some View {
         Button {
             showCSVFileImporter.toggle()
         } label: {
             Label("Import from CSV", systemImage: "rectangle.split.3x3")
+                .frame(maxWidth: .infinity)
         }
     }
+    /// Button for importing data from text.
     var addFromTextButton: some View {
         Button {
             sheet = .newStreamView
         } label: {
             Label("Import from text", systemImage: "text.alignleft")
+                .frame(maxWidth: .infinity)
         }
     }
     
+    // MARK: FUNCTIONS
+    
+    /// Imports stream data from CSV.
+    /// - Parameter urls: CSV import file.
     func processFile(urls: [URL]) {
         guard let url = urls.first else { alert = .fileImportFailure; return }
         guard let rawText = try? String(contentsOf: url) else { alert = .fileImportFailure; return }
