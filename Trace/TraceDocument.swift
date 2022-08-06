@@ -28,22 +28,56 @@ struct TraceDocument: FileDocument {
         self.contents = trace
     }
     
-    /// Initialises a trace document by reading a file and decoding its JSON data.
+    /// Initialises a trace document by reading a file and decoding and uncompressing its JSON data.
     /// - Parameter configuration: The configuration for reading the trace document.
     init(configuration: ReadConfiguration) throws {
-        guard let data = configuration.file.regularFileContents
-        else {
+        guard let data = configuration.file.regularFileContents else {
             throw CocoaError(.fileReadCorruptFile)
         }
-        contents = try JSONDecoder().decode(TraceDocumentContents.self, from: data)
+        
+        let compressedContents = try JSONDecoder().decode(CompressedTraceDocumentContents.self, from: data)
+        
+        contents = compressedContents.uncompressed()
     }
     
-    /// Wraps the trace document structure to a file.
+    /// Wraps the compressed trace document structure to a file.
     /// - Parameter configuration: The configuration for writing the trace document.
     /// - Returns: A file wrapper of the trace document's data.
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let data = try JSONEncoder().encode(contents)
+        let data = try JSONEncoder().encode(CompressedTraceDocumentContents(from: contents))
+        
         return .init(regularFileWithContents: data)
+    }
+}
+
+/// A compressed format for ``TraceDocumentContents``.
+struct CompressedTraceDocumentContents: Codable {
+    var subject: String?
+    var info: String?
+    var sampleRate: Double
+    var events: [String: [Int]]?
+    var streams: [String: [Double]]
+    
+    init(from contents: TraceDocumentContents) {
+        subject = contents.subject
+        info = contents.info
+        sampleRate = contents.sampleRate
+        events = contents.events
+        streams = contents.streams.reduce(into: [String: [Double]]()) { partialResult, stream in
+            partialResult[stream.electrode.symbol] = stream.samples
+        }
+    }
+    
+    func uncompressed() -> TraceDocumentContents {
+        let uncompressedStreams: [Stream] = streams.compactMap { (key: String, value: [Double]) in
+            guard let electrode = Electrode.electrode(from: key) else {
+                return nil
+            }
+            
+            return Stream(electrode: electrode, samples: value)
+        }
+        
+        return TraceDocumentContents(subject: subject, info: info, streams: uncompressedStreams, sampleRate: sampleRate, events: events)
     }
 }
 
