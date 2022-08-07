@@ -12,6 +12,7 @@
 		C67DE07D289F95D7004A5D75 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07C289F95D7004A5D75 /* Stream.swift */; };
 		C67DE07F289F99F2004A5D75 /* Electrode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07E289F99F2004A5D75 /* Electrode.swift */; };
 		C67DE081289F9EB9004A5D75 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE080289F9EB9004A5D75 /* Extensions.swift */; };
+		C67DE084289F9F63004A5D75 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = C67DE083289F9F62004A5D75 /* Documentation.docc */; };
 		C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8928944CA000473F34 /* DocumentView.swift */; };
 		C6B8BA8C289471C300473F34 /* StreamDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8B289471C300473F34 /* StreamDetailView.swift */; };
 		C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */; };
@@ -51,6 +52,7 @@
 		C67DE07C289F95D7004A5D75 /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		C67DE07E289F99F2004A5D75 /* Electrode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Electrode.swift; sourceTree = "<group>"; };
 		C67DE080289F9EB9004A5D75 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		C67DE083289F9F62004A5D75 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		C6B8BA8928944CA000473F34 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		C6B8BA8B289471C300473F34 /* StreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamDetailView.swift; sourceTree = "<group>"; };
 		C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPreferencesView.swift; sourceTree = "<group>"; };
@@ -133,8 +135,8 @@
 		C6DC5BA12874B795007B679C /* Trace */ = {
 			isa = PBXGroup;
 			children = (
+				C67DE083289F9F62004A5D75 /* Documentation.docc */,
 				C6DC5BA22874B795007B679C /* TraceApp.swift */,
-				C67DE082289F9EFC004A5D75 /* Structures */,
 				C6B8BA8928944CA000473F34 /* DocumentView.swift */,
 				C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */,
 				C6B8BA9128947EC300473F34 /* ChartView.swift */,
@@ -142,6 +144,7 @@
 				C6DC5BD42874C0A5007B679C /* NewStreamView.swift */,
 				C6DC5BD82874C9DE007B679C /* ImportFromTextView.swift */,
 				C6B8BA8B289471C300473F34 /* StreamDetailView.swift */,
+				C67DE082289F9EFC004A5D75 /* Structures */,
 				C6DC5BA82874B797007B679C /* Assets.xcassets */,
 				C6DC5BAA2874B797007B679C /* Info.plist */,
 				C6DC5BAB2874B797007B679C /* Trace.entitlements */,
@@ -318,6 +321,7 @@
 				C6B8BA8C289471C300473F34 /* StreamDetailView.swift in Sources */,
 				C6DC5BA32874B795007B679C /* TraceApp.swift in Sources */,
 				C67DE07F289F99F2004A5D75 /* Electrode.swift in Sources */,
+				C67DE084289F9F63004A5D75 /* Documentation.docc in Sources */,
 				C67DE081289F9EB9004A5D75 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
