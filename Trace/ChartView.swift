@@ -50,9 +50,9 @@ struct ChartView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                if let minPotential = doc.contents.minPotential, let maxPotential = doc.contents.maxPotential {
+                if let potentialRange = doc.contents.potentialRange {
                     chart
-                        .chartYScale(domain: minPotential...maxPotential)
+                        .chartYScale(domain: potentialRange)
                         .chartXScale(domain: ClosedRange(uncheckedBounds: (lower: timeWindow.lowerBound, upper: timeWindow.upperBound)))
                         .chartXAxis {
                             AxisMarks(values: xValues)
@@ -143,34 +143,46 @@ struct ChartView: View {
         }
         .disabled(windowStart + windowSize > doc.contents.sampleCount ?? 0)
     }
+    var windowSizingButtons: some View {
+        Section {
+            Button {
+                windowSize += 100
+            } label: {
+                Label("Increase window size", systemImage: "plus")
+            }
+            .disabled(windowSize + 100 > 1000)
+            
+            Button {
+                windowSize -= 100
+            } label: {
+                Label("Decrease window size", systemImage: "minus")
+            }
+            .disabled(windowSize - 100 < 100)
+        }
+    }
+    var generalSelectionButtons: some View {
+        Section {
+            Button("Select all") { selectedStreams = doc.contents.streams }
+            Button("Deselect all") { selectedStreams = [] }
+        }
+    }
     var streamSelector: some View {
         Menu {
-            Section {
-                Button {
-                    windowSize += 100
-                } label: {
-                    Label("Increase window size", systemImage: "plus")
-                }
-                .disabled(windowSize + 100 > 1000)
-                
-                Button {
-                    windowSize -= 100
-                } label: {
-                    Label("Decrease window size", systemImage: "minus")
-                }
-                .disabled(windowSize - 100 < 100)
-            }
+            windowSizingButtons
             
             Section {
                 Menu {
-                    Section {
-                        Button("Select all") { selectedStreams = doc.contents.streams }
-                        Button("Deselect all") { selectedStreams = [] }
-                    }
+                    generalSelectionButtons
                     
                     ForEach(doc.contents.prefixes, id: \.self) { pre in
                         Section {
-                            ForEach(Stream.sortByElectrode(doc.contents.streams.filter { stream in return stream.electrode.prefix == pre }), id: \.self) { stream in
+                            let streams = doc.contents.streams.filter { stream in
+                                return stream.electrode.prefix == pre
+                            }.sorted(by: { a, b in
+                                a.electrode.suffix < b.electrode.suffix
+                            })
+                                                                                                                                 
+                            ForEach(streams) { stream in
                                 Button {
                                     if selectedStreams.contains(stream) {
                                         selectedStreams.removeAll(where: { $0.id == stream.id })

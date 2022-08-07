@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C67DE079289F9599004A5D75 /* TraceDocumentContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE078289F9599004A5D75 /* TraceDocumentContents.swift */; };
+		C67DE07B289F95C2004A5D75 /* CompressedTraceDocumentContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07A289F95C2004A5D75 /* CompressedTraceDocumentContents.swift */; };
+		C67DE07D289F95D7004A5D75 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07C289F95D7004A5D75 /* Stream.swift */; };
+		C67DE07F289F99F2004A5D75 /* Electrode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07E289F99F2004A5D75 /* Electrode.swift */; };
+		C67DE081289F9EB9004A5D75 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE080289F9EB9004A5D75 /* Extensions.swift */; };
 		C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8928944CA000473F34 /* DocumentView.swift */; };
 		C6B8BA8C289471C300473F34 /* StreamDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8B289471C300473F34 /* StreamDetailView.swift */; };
 		C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */; };
@@ -41,6 +46,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C67DE078289F9599004A5D75 /* TraceDocumentContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraceDocumentContents.swift; sourceTree = "<group>"; };
+		C67DE07A289F95C2004A5D75 /* CompressedTraceDocumentContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressedTraceDocumentContents.swift; sourceTree = "<group>"; };
+		C67DE07C289F95D7004A5D75 /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
+		C67DE07E289F99F2004A5D75 /* Electrode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Electrode.swift; sourceTree = "<group>"; };
+		C67DE080289F9EB9004A5D75 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C6B8BA8928944CA000473F34 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		C6B8BA8B289471C300473F34 /* StreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamDetailView.swift; sourceTree = "<group>"; };
 		C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPreferencesView.swift; sourceTree = "<group>"; };
@@ -87,6 +97,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C67DE082289F9EFC004A5D75 /* Structures */ = {
+			isa = PBXGroup;
+			children = (
+				C6DC5BA42874B795007B679C /* TraceDocument.swift */,
+				C67DE078289F9599004A5D75 /* TraceDocumentContents.swift */,
+				C67DE07A289F95C2004A5D75 /* CompressedTraceDocumentContents.swift */,
+				C67DE07C289F95D7004A5D75 /* Stream.swift */,
+				C67DE07E289F99F2004A5D75 /* Electrode.swift */,
+				C67DE080289F9EB9004A5D75 /* Extensions.swift */,
+			);
+			path = Structures;
+			sourceTree = "<group>";
+		};
 		C6DC5B962874B795007B679C = {
 			isa = PBXGroup;
 			children = (
@@ -111,7 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				C6DC5BA22874B795007B679C /* TraceApp.swift */,
-				C6DC5BA42874B795007B679C /* TraceDocument.swift */,
+				C67DE082289F9EFC004A5D75 /* Structures */,
 				C6B8BA8928944CA000473F34 /* DocumentView.swift */,
 				C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */,
 				C6B8BA9128947EC300473F34 /* ChartView.swift */,
@@ -284,13 +307,18 @@
 			files = (
 				C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */,
 				C6DC5BA52874B795007B679C /* TraceDocument.swift in Sources */,
+				C67DE079289F9599004A5D75 /* TraceDocumentContents.swift in Sources */,
 				C6DC5BD52874C0A5007B679C /* NewStreamView.swift in Sources */,
 				C6DC5BD92874C9DE007B679C /* ImportFromTextView.swift in Sources */,
+				C67DE07B289F95C2004A5D75 /* CompressedTraceDocumentContents.swift in Sources */,
 				C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */,
+				C67DE07D289F95D7004A5D75 /* Stream.swift in Sources */,
 				C6B8BA90289478DE00473F34 /* ScalpMapView.swift in Sources */,
 				C6B8BA9228947EC300473F34 /* ChartView.swift in Sources */,
 				C6B8BA8C289471C300473F34 /* StreamDetailView.swift in Sources */,
 				C6DC5BA32874B795007B679C /* TraceApp.swift in Sources */,
+				C67DE07F289F99F2004A5D75 /* Electrode.swift in Sources */,
+				C67DE081289F9EB9004A5D75 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

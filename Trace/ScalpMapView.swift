@@ -72,10 +72,9 @@ struct ScalpMapView: View {
         GeometryReader { proxy in
             Canvas { context, size in
                 for stream in selectedStreams {
-                    if let sector = Electrode.sector(stream: stream, size: proxy.size),
-                       let min = doc.contents.minPotential,
-                       let max = doc.contents.maxPotential {
-                        context.fill(sector, with: .color(Stream.scalpMapColor(value: stream.samples[index], min: min, max: max)))
+                    if let sector = stream.electrode.sector(in: size),
+                       let color = stream.color(at: index) {
+                        context.fill(sector, with: .color(color))
                     }
                 }
             }
@@ -110,7 +109,7 @@ struct ScalpMapView: View {
                 streamSelector
                     .onChange(of: selectedStreams) { newValue in
                         selectedStreams = newValue.filter { stream in
-                            Electrode.location(from: stream.electrode) != nil
+                            stream.electrode.location() != nil
                         }
                     }
             }
@@ -187,7 +186,7 @@ struct ScalpMapView: View {
         }
     }
     func electrodePoint(stream: Stream, size: CGSize) -> CGPoint? {
-        guard let location = Electrode.location(from: stream.electrode) else {
+        guard let location = stream.electrode.location() else {
             return nil
         }
         
@@ -202,7 +201,13 @@ struct ScalpMapView: View {
             
             ForEach(doc.contents.prefixes, id: \.self) { pre in
                 Section {
-                    ForEach(Stream.sortByElectrode(doc.contents.streams.filter { stream in return stream.electrode.prefix == pre }), id: \.self) { stream in
+                    let streams = doc.contents.streams.filter { stream in
+                        return stream.electrode.prefix == pre
+                    }.sorted { a, b in
+                        a.electrode.suffix < b.electrode.suffix
+                    }
+                    
+                    ForEach(streams, id: \.self) { stream in
                         Button {
                             if selectedStreams.contains(stream) {
                                 selectedStreams.removeAll(where: { $0.id == stream.id })
