@@ -8,6 +8,29 @@ View EEG data conveniently on your phone, with the same powerful functions as de
 
 ## Topics
 
-### <!--@START_MENU_TOKEN@-->Group<!--@END_MENU_TOKEN@-->
+### Articles
 
-- <!--@START_MENU_TOKEN@-->``Symbol``<!--@END_MENU_TOKEN@-->
+- <doc:Electrode-support>
+- <doc:Document-lifecycle>
+- <doc:Scalp-map-visualisation>
+
+### Data structures
+
+- ``TraceDocument``
+- ``TraceDocumentContents``
+- ``CompressedTraceDocumentContents``
+- ``Stream``
+- ``Electrode``
+
+### Views
+
+- ``DocumentView``
+- ``ScalpMapView``
+- ``ChartView``
+
+### Subviews
+
+- ``NewStreamView``
+- ``DocumentPreferencesView``
+- ``ImportFromTextView``
+- ``StreamDetailView``

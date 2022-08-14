@@ -57,8 +57,30 @@ struct ScalpMapView: View {
             .padding()
             .navigationTitle("Rendering \(selectedStreams.count) of \(doc.contents.streams.count)")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: Stream.self, destination: { stream in StreamDetailView(doc: $doc, stream: stream) })
-            .toolbar(content: { toolbar })
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction, content: { doneButton })
+                
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Spacer()
+                    
+                    stepBackward10Button
+                    stepBackward1Button
+                    playButton
+                    stepForward1Button
+                    stepForward10Button
+                    
+                    Spacer()
+                }
+                
+                ToolbarItem(placement: .navigationBarLeading) {
+                    streamSelector
+                        .onChange(of: selectedStreams) { newValue in
+                            selectedStreams = newValue.filter { stream in
+                                stream.electrode.location != nil
+                            }
+                        }
+                }
+            }
             .task {
                 selectedStreams = doc.contents.streams
             }
@@ -76,51 +98,11 @@ struct ScalpMapView: View {
         return "Sample \(index + 1) of \(count)"
     }
     var visualisation: some View {
-        GeometryReader { proxy in
-            Canvas { context, size in
-                for stream in selectedStreams {
-                    if let sector = stream.electrode.sector(in: size),
-                       let color = stream.color(at: index) {
-                        context.fill(sector, with: .color(color))
-                    }
-                }
-            }
-            
-            ForEach(selectedStreams) { stream in
-                NavigationLink(value: stream) {
-                    Text(stream.electrode.symbol)
-                        .font(.caption.bold())
-                        .foregroundStyle(.ultraThickMaterial)
-                }
-                .position(electrodePoint(stream: stream, size: proxy.size)!)
-            }
-        }
-    }
-    var toolbar: some ToolbarContent {
-        Group {
-            ToolbarItem(placement: .confirmationAction, content: { doneButton })
-            
-            ToolbarItemGroup(placement: .bottomBar) {
-                Spacer()
-                
-                stepBackward10Button
-                stepBackward1Button
-                playButton
-                stepForward1Button
-                stepForward10Button
-                
-                Spacer()
-            }
-            
-            ToolbarItem(placement: .navigationBarLeading) {
-                streamSelector
-                    .onChange(of: selectedStreams) { newValue in
-                        selectedStreams = newValue.filter { stream in
-                            stream.electrode.location() != nil
-                        }
-                    }
-            }
-        }
+        TraceDocumentContents.Visualisation(
+            streams: selectedStreams,
+            potentialRange: doc.contents.potentialRange,
+            index: index
+        )
     }
     var doneButton: some View {
         Button {
@@ -191,13 +173,6 @@ struct ScalpMapView: View {
                 step()
             }
         }
-    }
-    func electrodePoint(stream: Stream, size: CGSize) -> CGPoint? {
-        guard let location = stream.electrode.location() else {
-            return nil
-        }
-        
-        return location.cgPoint(in: size)
     }
     var streamSelector: some View {
         Menu {

@@ -18,10 +18,6 @@ When a file is opened, it is either new or pre-existing:
 
 The ``TraceDocument/fileWrapper(configuration:)`` function governs saving of the file to disk. A ``CompressedTraceDocumentContents`` is initialised from a snapshot of the ``TraceDocumentContents`` held by ``TraceDocument/contents`` and then encoded to JSON and saved through a file wrapper.
  
-## Topics
+## See Also
 
 ### Relevant structures
-
-- ``TraceDocument``
-- ``TraceDocumentContents``
-- ``CompressedTraceDocumentContents``

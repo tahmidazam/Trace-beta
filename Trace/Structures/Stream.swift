@@ -39,20 +39,18 @@ struct Stream: Identifiable, Codable, Hashable {
     /// Calculates the colour to render a scalp map segment at a given index.
     /// - Parameter index: The index to calculate the color of.
     /// - Returns: The color to render the scalp map segment.
-    func color(at index: Int) -> Color? {
+    func color(at index: Int, globalPotentialRange: ClosedRange<Double>) -> Color? {
         let value = samples[index]
-        
-        guard let potentialRange else { return nil }
         
         let positiveColors: [UIColor] = [UIColor(.green), UIColor(.yellow), UIColor(.red)]
         let negativeColors: [UIColor] = [UIColor(.green), UIColor(.cyan), UIColor(.blue)]
         
         if value >= 0 {
-            let prop: Double = (value / potentialRange.upperBound) * 100
+            let prop: Double = (value / globalPotentialRange.upperBound) * 100
             
             return Color(uiColor: positiveColors.intermediate(percentage: prop))
         } else {
-            let prop: Double = (value / potentialRange.lowerBound) * 100
+            let prop: Double = (value / globalPotentialRange.lowerBound) * 100
             
             return Color(uiColor: negativeColors.intermediate(percentage: prop))
         }

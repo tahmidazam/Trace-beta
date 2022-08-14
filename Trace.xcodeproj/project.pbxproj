@@ -266,6 +266,9 @@
 				Base,
 			);
 			mainGroup = C6DC5B962874B795007B679C;
+			packageReferences = (
+				C62BD2B9289FB551007C0E97 /* XCRemoteSwiftPackageReference "swift-docc-plugin" */,
+			);
 			productRefGroup = C6DC5BA02874B795007B679C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -664,6 +667,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C62BD2B9289FB551007C0E97 /* XCRemoteSwiftPackageReference "swift-docc-plugin" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-docc-plugin";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = C6DC5B972874B795007B679C /* Project object */;
 }

@@ -13,6 +13,7 @@
 //  You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses/.
 
 import Foundation
+import SwiftUI
 
 /// The data structure for the contents of a trace document.
 struct TraceDocumentContents: Identifiable, Codable {
@@ -77,12 +78,56 @@ struct TraceDocumentContents: Identifiable, Codable {
         }
     }
     
+    
     // MARK: FUNCTIONS
     /// Converts a stream index to a time value, in seconds, s.
     /// - Parameter index: The index to convert.
     /// - Returns: The time value, in seconds, s.
     func time(at index: Int) -> Double {
         return Double(index) * (1 / sampleRate)
+    }
+    
+//    func eventRelatedPotentials(epochWindow: ClosedRange<Int>, eventKey: String? = nil) -> [Double]? {
+//        guard let events, let sampleCount else {
+//            return nil
+//        }
+//        
+//        var eventIndexes: [Int] = []
+//        
+//        if eventKey != nil {
+//            guard let value = events[eventKey!] else {
+//                return nil
+//            }
+//            
+//            eventIndexes = value
+//        } else {
+//            eventIndexes = events.map { (key: String, value: [Int]) in
+//                return value
+//            }.flatMap({ (element: [Int]) -> [Int] in
+//                return element
+//            })
+//        }
+//        
+//        eventIndexes = eventIndexes.filter { index in
+//            let specificEpochWindow = (index - epochWindow.lowerBound)...(index + epochWindow.upperBound)
+//            let documentWindow = 0...sampleCount
+//            
+//            index >= 0 && documentWindow.contains(specificEpochWindow)
+//        }
+//        
+//        eventIndexes.map { index in
+//            let specificEpochWindow = (index - epochWindow.lowerBound)...(index + epochWindow.upperBound)
+//            
+//            let allStreams = streams.map { stream in
+//                return stream.samples[specificEpochWindow]
+//            }
+//            
+//            let eventRelatedPotential = specificEpochWindow.map { epochIndex in
+//                allStreams.map { streamSamples -> Double in
+//                    return streamSamples[epochIndex]
+//                }.reduce(0, +) / specificEpochWindow.count
+//            }
+//        }
     }
     
     // MARK: STATIC FUNCTIONS
@@ -177,5 +222,24 @@ struct TraceDocumentContents: Identifiable, Codable {
         var timestamp: Double
         /// The y-axis potential value in millivolts, mV.
         var potential: Double
+    }
+    struct Visualisation: View {
+        var streams: [Stream]
+        var potentialRange: ClosedRange<Double>?
+        var index: Int
+        
+        var body: some View {
+            Canvas { context, size in
+                for stream in streams {
+                    if let sector = stream.electrode.sector(in: size),
+                       let location = stream.electrode.location?.cgPoint(in: size),
+                       let potentialRange = potentialRange,
+                       let color = stream.color(at: index, globalPotentialRange: potentialRange) {
+                        context.fill(sector, with: .color(color))
+                        context.draw(Text(stream.electrode.symbol).font(.caption.bold()).foregroundColor(.white), at: location)
+                    }
+                }
+            }
+        }
     }
 }
