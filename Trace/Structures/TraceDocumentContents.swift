@@ -128,7 +128,7 @@ struct TraceDocumentContents: Identifiable, Codable {
 //                }.reduce(0, +) / specificEpochWindow.count
 //            }
 //        }
-    }
+//    }
     
     // MARK: STATIC FUNCTIONS
     /// Imports (multiple) streams from a `.csv` file.

@@ -209,8 +209,6 @@ struct DocumentView: View {
     /// The toolbar of the view.
     var toolbarView: some ToolbarContent {
         Group {
-            ToolbarItem(placement: .navigationBarLeading, content: { closeFileButton })
-            
             if !documentIsEmpty {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     newStreamButton
