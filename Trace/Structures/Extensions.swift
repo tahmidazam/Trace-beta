@@ -50,6 +50,43 @@ extension Array where Element: UIColor {
         }
     }
 }
+#else
+extension Array where Element: NSColor {
+    /// Finds a color from a gradient stop.
+    /// - Parameter percentage: The gradient stop.
+    /// - Returns: The color at the stop.
+    func intermediate(percentage: CGFloat) -> NSColor {
+        let percentage = Swift.max(Swift.min(percentage, 100), 0) / 100
+        switch percentage {
+        case 0: return first ?? .clear
+        case 1: return last ?? .clear
+        default:
+            let approxIndex = percentage / (1 / CGFloat(count - 1))
+            let firstIndex = Int(approxIndex.rounded(.down))
+            let secondIndex = Int(approxIndex.rounded(.up))
+            let fallbackIndex = Int(approxIndex.rounded())
+            
+            let firstColor = self[firstIndex]
+            let secondColor = self[secondIndex]
+            let fallbackColor = self[fallbackIndex]
+            
+            guard let firstCI = CIColor(color: firstColor), let secondCI = CIColor(color: secondColor) else {
+                return fallbackColor
+            }
+            
+            let (r1, g1, b1, a1): (CGFloat, CGFloat, CGFloat, CGFloat) = (firstCI.red, firstCI.green, firstCI.blue, firstCI.alpha)
+            let (r2, g2, b2, a2): (CGFloat, CGFloat, CGFloat, CGFloat) = (secondCI.red, secondCI.green, secondCI.blue, secondCI.alpha)
+            
+            let intermediatePercentage = approxIndex - CGFloat(firstIndex)
+            return NSColor(
+                red: CGFloat(r1 + (r2 - r1) * intermediatePercentage),
+                green: CGFloat(g1 + (g2 - g1) * intermediatePercentage),
+                blue: CGFloat(b1 + (b2 - b1) * intermediatePercentage),
+                alpha: CGFloat(a1 + (a2 - a1) * intermediatePercentage)
+            )
+        }
+    }
+}
 #endif
 
 extension Double {

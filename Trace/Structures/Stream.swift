@@ -56,6 +56,27 @@ struct Stream: Identifiable, Codable, Hashable {
             return Color(uiColor: negativeColors.intermediate(percentage: prop))
         }
     }
+    #else
+    // MARK: FUNCTIONS
+    /// Calculates the colour to render a scalp map segment at a given index.
+    /// - Parameter index: The index to calculate the color of.
+    /// - Returns: The color to render the scalp map segment.
+    func color(at index: Int, globalPotentialRange: ClosedRange<Double>) -> Color? {
+        let value = samples[index]
+        
+        let positiveColors: [NSColor] = [NSColor(.green), NSColor(.yellow), NSColor(.red)]
+        let negativeColors: [NSColor] = [NSColor(.green), NSColor(.cyan), NSColor(.blue)]
+        
+        if value >= 0 {
+            let prop: Double = (value / globalPotentialRange.upperBound) * 100
+            
+            return Color(nsColor: positiveColors.intermediate(percentage: prop))
+        } else {
+            let prop: Double = (value / globalPotentialRange.lowerBound) * 100
+            
+            return Color(nsColor: negativeColors.intermediate(percentage: prop))
+        }
+    }
     #endif
     
     // MARK: STATIC FUNCTIONS

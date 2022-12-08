@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-
+#if os(macOS)
 struct ContentView: View {
     @Binding var doc: TraceDocument
     @Binding var streamIds: Set<Stream.ID>
+    
     @Binding var tab: DocumentView.Tab
     
     var body: some View {
@@ -17,7 +18,7 @@ struct ContentView: View {
             switch tab {
             case .streams: StreamsView(doc: $doc, streamIds: $streamIds)
             case .events: EmptyView()
-            case .scalpMap: VisualiseView()
+            case .scalpMap: VisualiseView(doc: $doc)
             case .plot: PlotView()
             case .study: EmptyView()
             }
@@ -25,3 +26,4 @@ struct ContentView: View {
         .navigationSubtitle("\(doc.contents.streams.count) stream\(doc.contents.streams.count == 1 ? "" : "s")")
     }
 }
+#endif

@@ -6,8 +6,9 @@
 //
 
 import SwiftUI
-
+#if os(macOS)
 struct SidebarView: View {
+    
     @Binding var tab: DocumentView.Tab
     
     var body: some View {
@@ -35,3 +36,4 @@ struct SidebarView: View {
         
     }
 }
+#endif

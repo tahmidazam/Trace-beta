@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(macOS)
 struct DetailView: View {
     @Binding var doc: TraceDocument
     @Binding var streamIds: Set<Stream.ID>
@@ -24,3 +25,4 @@ struct DetailView: View {
         }
     }
 }
+#endif

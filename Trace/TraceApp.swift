@@ -19,7 +19,9 @@ struct TraceApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: TraceDocument()) { file in
             DocumentView(doc: file.$document)
-//                .toolbar(.hidden)
+            #if os(iOS)
+                .toolbar(.hidden)
+            #endif
         }
     }
 }

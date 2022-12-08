@@ -377,10 +377,8 @@ struct DocumentView: View {
         
         NavigationSplitView {
             SidebarView(tab: $tab)
-        } content: {
-            ContentView(doc: $doc, streamIds: $streamIds, tab: $tab)
         } detail: {
-            DetailView(doc: $doc, streamIds: $streamIds, tab: $tab)
+            ContentView(doc: $doc, streamIds: $streamIds, tab: $tab)
         }
     }
 }

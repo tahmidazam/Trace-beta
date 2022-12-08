@@ -233,6 +233,8 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
         return path
     }
     
+    static var rings: [Double] = [(2 / 5.5), (4 / 5.5)]
+    
     // MARK: STRUCTURES
     /// A polar coordinate system for electrodes.
     struct Polar {
