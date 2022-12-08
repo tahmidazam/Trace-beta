@@ -24,6 +24,8 @@ struct CompressedTraceDocumentContents: Codable {
     var sampleRate: Double
     /// A dictionary containing each event type and their events as indexes.
     var events: [String: [Int]]?
+    /// Length of an epoch in number of samples
+    var epochLength: Int?
     /// A dictionary containing each stream, keyed by the stream's electrode and valued by an array of the stream's samples.
     var streams: [String: [Double]]
     
@@ -34,6 +36,7 @@ struct CompressedTraceDocumentContents: Codable {
         info = contents.info
         sampleRate = contents.sampleRate
         events = contents.events
+        epochLength = contents.epochLength
         streams = contents.streams.reduce(into: [String: [Double]]()) { partialResult, stream in
             partialResult[stream.electrode.symbol] = stream.samples
         }
@@ -50,6 +53,6 @@ struct CompressedTraceDocumentContents: Codable {
             return Stream(electrode: electrode, samples: value)
         }
         
-        return TraceDocumentContents(subject: subject, info: info, streams: uncompressedStreams, sampleRate: sampleRate, events: events)
+        return TraceDocumentContents(subject: subject, info: info, streams: uncompressedStreams, sampleRate: sampleRate, events: events, epochLength: epochLength)
     }
 }

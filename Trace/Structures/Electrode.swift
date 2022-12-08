@@ -267,7 +267,9 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
     
     // MARK: ENUMERATIONS
     /// An enumeration for all the lobes/areas of the brain and is more specific than ``GeneralArea-swift.enum``.
-    enum Prefix: String, Codable, CaseIterable {
+    enum Prefix: String, Codable, CaseIterable, Identifiable {
+        var id: Self { self }
+        
         case prefrontal, frontal, temporal, parietal, occipital, central, mastoid
         
         /// The symbol for each lobe/area.

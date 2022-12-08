@@ -15,6 +15,7 @@
 import SwiftUI
 import Charts
 
+#if os(iOS)
 struct StreamDetailView: View {
     @Binding var doc: TraceDocument
     
@@ -34,3 +35,30 @@ struct StreamDetailView: View {
         }
     }
 }
+#else
+
+struct StreamDetailView: View {
+    @Binding var doc: TraceDocument
+    @Binding var streamIds: Set<Stream.ID>
+    @Binding var tab: DocumentView.Tab
+    
+    var window: Range<Int> = 0..<100
+    
+    var body: some View {
+        Chart(TraceDocumentContents.sampleDataPoints(from: doc.contents.streams.filter({ stream in
+            streamIds.contains(stream.id)
+        }), sampleRate: doc.contents.sampleRate, spliced: window)) { point in
+            LineMark(
+                x: .value("time/s", point.timestamp),
+                y: .value("potential/mV", point.potential)
+            )
+            .foregroundStyle(by: .value("Electrode", point.electrode.symbol))
+        }
+        .chartYAxis(content: {
+            AxisMarks(position: .leading)
+        })
+        .padding()
+    }
+}
+
+#endif

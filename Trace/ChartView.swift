@@ -15,6 +15,7 @@
 import SwiftUI
 import Charts
 
+#if os(iOS)
 struct ChartView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var doc: TraceDocument
@@ -224,3 +225,4 @@ struct ChartView_Previews: PreviewProvider {
         ChartView(doc: .constant(TraceDocument()))
     }
 }
+#endif

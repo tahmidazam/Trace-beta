@@ -14,6 +14,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct ImportFromTextView: View {
     @Environment(\.presentationMode) var presentationMode
     
@@ -84,3 +85,4 @@ struct ImportFromTextView_Previews: PreviewProvider {
         ImportFromTextView(stream: .constant(Stream(electrode: .init(prefix: .parietal, suffix: 0), samples: [])))
     }
 }
+#endif

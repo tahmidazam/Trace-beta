@@ -32,6 +32,9 @@ struct TraceDocumentContents: Identifiable, Codable {
     /// A dictionary containing each event type and their events as indexes.
     var events: [String: [Int]]?
     
+    /// Length of an event epoch in the number of samples post event stamp.
+    var epochLength: Int?
+    
     // MARK: COMPUTED PROPERTIES
     /// The number of samples.
     var sampleCount: Int? {
@@ -211,7 +214,9 @@ struct TraceDocumentContents: Identifiable, Codable {
     
     // MARK: STRUCTURES
     /// A data structure suitable for parsing by charts that represents a potential, along with its timestamp and associated electrode.
-    struct SampleDataPoint: Hashable {
+    struct SampleDataPoint: Hashable, Identifiable {
+        var id: Self { self }
+        
         static func == (lhs: TraceDocumentContents.SampleDataPoint, rhs: TraceDocumentContents.SampleDataPoint) -> Bool {
             lhs.electrode == rhs.electrode && lhs.timestamp == rhs.timestamp && lhs.potential == rhs.potential
         }
@@ -223,6 +228,7 @@ struct TraceDocumentContents: Identifiable, Codable {
         /// The y-axis potential value in millivolts, mV.
         var potential: Double
     }
+    #if os(iOS)
     struct Visualisation: View {
         var streams: [Stream]
         var potentialRange: ClosedRange<Double>?
@@ -242,4 +248,5 @@ struct TraceDocumentContents: Identifiable, Codable {
             }
         }
     }
+    #endif
 }

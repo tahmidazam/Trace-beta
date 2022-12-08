@@ -14,6 +14,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct DocumentView: View {
     // MARK: ARGUMENTS
     /// The document to display.
@@ -358,6 +359,32 @@ struct DocumentView: View {
         doc.contents.streams = streams
     }
 }
+#else
+
+struct DocumentView: View {
+    @Binding var doc: TraceDocument
+    
+    @State var tab: Tab = Tab.streams
+    enum Tab: String, Identifiable, CaseIterable {
+        var id: Self { self }
+        
+        case streams, events, scalpMap, plot, study
+    }
+    
+    @State var streamIds: Set<Stream.ID> = []
+    
+    var body: some View {
+        
+        NavigationSplitView {
+            SidebarView(tab: $tab)
+        } content: {
+            ContentView(doc: $doc, streamIds: $streamIds, tab: $tab)
+        } detail: {
+            DetailView(doc: $doc, streamIds: $streamIds, tab: $tab)
+        }
+    }
+}
+#endif
 
 struct DocumentView_Previews: PreviewProvider {
     static var previews: some View {

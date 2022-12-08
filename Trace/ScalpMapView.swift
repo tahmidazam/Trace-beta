@@ -14,6 +14,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct ScalpMapView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var doc: TraceDocument
@@ -219,3 +220,4 @@ struct ScalpMapView_Previews: PreviewProvider {
         ScalpMapView(doc: .constant(TraceDocument()))
     }
 }
+#endif

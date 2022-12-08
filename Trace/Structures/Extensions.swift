@@ -15,6 +15,7 @@
 import Foundation
 import SwiftUI
 
+#if os(iOS)
 extension Array where Element: UIColor {
     /// Finds a color from a gradient stop.
     /// - Parameter percentage: The gradient stop.
@@ -49,6 +50,7 @@ extension Array where Element: UIColor {
         }
     }
 }
+#endif
 
 extension Double {
     /// Formats a double as a string.

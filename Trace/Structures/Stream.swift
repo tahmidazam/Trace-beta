@@ -35,6 +35,7 @@ struct Stream: Identifiable, Codable, Hashable {
         return min...max
     }
     
+    #if os(iOS)
     // MARK: FUNCTIONS
     /// Calculates the colour to render a scalp map segment at a given index.
     /// - Parameter index: The index to calculate the color of.
@@ -55,6 +56,7 @@ struct Stream: Identifiable, Codable, Hashable {
             return Color(uiColor: negativeColors.intermediate(percentage: prop))
         }
     }
+    #endif
     
     // MARK: STATIC FUNCTIONS
     /// Import samples of potentials from a text input.
@@ -98,7 +100,9 @@ struct Stream: Identifiable, Codable, Hashable {
     
     // MARK: STRUCTURES
     /// A data structure suitable for parsing by charts.
-    struct SampleDataPoint: Hashable {
+    struct SampleDataPoint: Hashable, Identifiable {
+        var id: Self { self }
+        
         /// The x-axis time value.
         var timestamp: Double
         /// The y-axis potential value.

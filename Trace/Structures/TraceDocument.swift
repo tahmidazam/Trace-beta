@@ -17,7 +17,7 @@ import UniformTypeIdentifiers
 
 extension UTType {
     static var trace: UTType {
-        UTType(importedAs: "com.example.trace")
+        UTType(importedAs: "com.Tahmid-Azam.trace")
     }
 }
 

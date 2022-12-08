@@ -15,6 +15,7 @@
 import SwiftUI
 import Charts
 
+#if os(iOS)
 struct NewStreamView: View {
     @Binding var document: TraceDocument
     @State var stream = Stream(electrode: .init(prefix: .parietal, suffix: 0), samples: [])
@@ -97,5 +98,84 @@ struct NewStreamView: View {
 struct NewStreamView_Previews: PreviewProvider {
     static var previews: some View {
         NewStreamView(document: .constant(TraceDocument()))
+    }
+}
+#else
+
+struct NewStreamView: View {
+    
+    @State var stream = Stream(electrode: .init(prefix: .parietal, suffix: 0), samples: [])
+    
+    var body: some View {
+        VStack(spacing: 0.0) {
+            
+            VStack {
+                GroupBox {
+                    HStack {
+                        Text("Prefix")
+                        
+                        Spacer()
+                        
+                        Picker("Prefix", selection: $stream.electrode.prefix) {
+                            ForEach(Electrode.Prefix.allCases, id: \.self) { prefix in
+                                Text(prefix.rawValue).tag(prefix)
+                            }
+                        }
+                        .labelsHidden()
+                        .frame(width: 100)
+                    }
+                    
+                    Divider()
+                    
+                    HStack {
+                        Text("Suffix")
+                        
+                        Spacer()
+                        
+                        Picker("Suffix", selection: $stream.electrode.suffix) {
+                            ForEach(0...8, id: \.self) { i in
+                                Text("\(i)").tag(i)
+                            }
+                        }
+                        .labelsHidden()
+                        .frame(width: 100)
+                    }
+                }
+
+            }
+            .padding()
+            
+            Divider()
+            
+            HStack {
+                Button("Cancel") {
+                    
+                }
+                .keyboardShortcut(.cancelAction)
+                
+                Spacer()
+                
+                Button("Add stream") {
+                    
+                }
+                .keyboardShortcut(.defaultAction)
+
+            }
+            .padding()
+        }
+        
+    }
+}
+
+struct NewStreamView_Previews: PreviewProvider {
+    static var previews: some View {
+        NewStreamView()
+    }
+}
+#endif
+
+struct Previews_NewStreamView_LibraryContent: LibraryContentProvider {
+    var views: [LibraryItem] {
+        LibraryItem(/*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/)
     }
 }

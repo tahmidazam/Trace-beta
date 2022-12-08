@@ -13,6 +13,8 @@
 //  You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses/.
 import SwiftUI
 
+
+#if os(iOS)
 struct DocumentPreferencesView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var doc: TraceDocument
@@ -75,3 +77,4 @@ struct DocumentPreferencesView_Previews: PreviewProvider {
         DocumentPreferencesView(doc: .constant(TraceDocument()))
     }
 }
+#endif
