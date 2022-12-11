@@ -107,63 +107,106 @@ struct NewStreamView: View {
     @State var stream = Stream(electrode: .init(prefix: .parietal, suffix: 0), samples: [])
     
     var body: some View {
-        VStack(spacing: 0.0) {
-            
-            VStack {
-                GroupBox {
-                    HStack {
-                        Text("Prefix")
-                        
-                        Spacer()
-                        
-                        Picker("Prefix", selection: $stream.electrode.prefix) {
-                            ForEach(Electrode.Prefix.allCases, id: \.self) { prefix in
-                                Text(prefix.rawValue).tag(prefix)
+        NavigationSplitView {
+            GeometryReader { proxy in
+                ZStack {
+                    ForEach(Electrode.Prefix.allCases) { prefix_ in
+                        ForEach(prefix_.validSuffixes, id: \.self) { suffix in
+                            let electrode = Electrode(prefix: prefix_, suffix: suffix)
+                            
+                            if let sector = electrode.sector(in: proxy.size),
+                               let location = electrode.location?.cgPoint(in: proxy.size) {
+                                
+                                if electrode == stream.electrode {
+                                    sector.fill(Color.accentColor)
+                                    
+                                } else {
+                                    sector.fill(Color(.unemphasizedSelectedContentBackgroundColor))
+                                    
+                                }
+                                Text(electrode.symbol)
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .position(x: location.x, y: location.y)
                             }
                         }
-                        .labelsHidden()
-                        .frame(width: 100)
-                    }
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("Suffix")
-                        
-                        Spacer()
-                        
-                        Picker("Suffix", selection: $stream.electrode.suffix) {
-                            ForEach(0...8, id: \.self) { i in
-                                Text("\(i)").tag(i)
-                            }
-                        }
-                        .labelsHidden()
-                        .frame(width: 100)
                     }
                 }
-
             }
             .padding()
-            
-            Divider()
-            
-            HStack {
-                Button("Cancel") {
-                    
+            .padding()
+            .frame(minWidth: 300)
+        } detail: {
+            VStack(spacing: 0.0) {
+                VStack {
+                    GroupBox {
+                        prefixPicker
+                        
+                        Divider()
+                        
+                        suffixPicker
+                    }
+
                 }
-                .keyboardShortcut(.cancelAction)
+                .padding()
                 
                 Spacer()
                 
-                Button("Add stream") {
-                    
-                }
-                .keyboardShortcut(.defaultAction)
-
+                Divider()
+                
+                bottomBar
             }
-            .padding()
         }
+
+    }
+    
+    var bottomBar: some View {
+        HStack {
+            Button("Cancel") {
+                
+            }
+            .keyboardShortcut(.cancelAction)
+            
+            Spacer()
+            
+            Button("Add stream") {
+                
+            }
+            .keyboardShortcut(.defaultAction)
+
+        }
+        .padding()
         
+    }
+    
+    var prefixPicker: some View {
+        LabeledContent {
+            Picker("Prefix", selection: $stream.electrode.prefix) {
+                ForEach(Electrode.Prefix.allCases, id: \.self) { prefix in
+                    Text(prefix.rawValue).tag(prefix)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 100)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        } label: {
+            Text("Prefix")
+        }
+    }
+    
+    var suffixPicker: some View {
+        LabeledContent {
+            Picker("Suffix", selection: $stream.electrode.suffix) {
+                ForEach(0...8, id: \.self) { i in
+                    Text("\(i)").tag(i)
+                }
+            }
+            .labelsHidden()
+            .frame(width: 100)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        } label: {
+            Text("Suffix")
+        }
     }
 }
 
@@ -174,8 +217,3 @@ struct NewStreamView_Previews: PreviewProvider {
 }
 #endif
 
-struct Previews_NewStreamView_LibraryContent: LibraryContentProvider {
-    var views: [LibraryItem] {
-        LibraryItem(/*@START_MENU_TOKEN@*/Text("Hello, World!")/*@END_MENU_TOKEN@*/)
-    }
-}

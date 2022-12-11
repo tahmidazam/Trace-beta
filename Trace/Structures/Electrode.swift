@@ -148,6 +148,9 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
     }
     
     // MARK: FUNCTIONS
+    
+    
+    
     /// Calculates the sector of the scalp associated with the electrode in a given domain and range.
     /// - Parameter size: The domain and range to draw the sector in.
     /// - Returns: The path of the sector.
@@ -208,6 +211,11 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
     }
     
     // MARK: STATIC FUNCTIONS
+    
+    static func ==(lhs: Electrode, rhs: Electrode) -> Bool {
+        return lhs.prefix == rhs.prefix && lhs.suffix == rhs.suffix
+    }
+    
     /// Calculates the path for a sector in a given domain and range.
     /// - Parameters:
     ///   - size: The domain and range of the sector.
@@ -284,6 +292,18 @@ struct Electrode: Identifiable, Codable, Equatable, Hashable {
             case .occipital: return "O"
             case .central: return "C"
             case .mastoid: return "A"
+            }
+        }
+        
+        var validSuffixes: [Int] {
+            switch self {
+            case .prefrontal: return [1, 2]
+            case .frontal: return [0, 3, 4, 7, 8]
+            case .temporal: return [3, 4, 5, 6]
+            case .parietal: return [0, 3, 4]
+            case .occipital: return [1, 2]
+            case .central: return [0, 3, 4]
+            case .mastoid: return [1, 2]
             }
         }
     }

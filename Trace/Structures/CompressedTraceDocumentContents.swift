@@ -17,15 +17,15 @@ import Foundation
 /// A compressed format for ``TraceDocumentContents``.
 struct CompressedTraceDocumentContents: Codable {
     /// The subject name.
-    var subject: String?
+    var subject: String = ""
     /// Information relating to the subject.
-    var info: String?
+    var info: String = ""
     /// The sample rate of the EEG data, measured in Hertz, Hz.
     var sampleRate: Double
     /// A dictionary containing each event type and their events as indexes.
-    var events: [String: [Int]]?
+    var events: [String: [Int]] = [:]
     /// Length of an epoch in number of samples
-    var epochLength: Int?
+    var epochLength: Int = 100
     /// A dictionary containing each stream, keyed by the stream's electrode and valued by an array of the stream's samples.
     var streams: [String: [Double]]
     

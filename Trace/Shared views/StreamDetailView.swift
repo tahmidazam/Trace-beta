@@ -40,7 +40,6 @@ struct StreamDetailView: View {
 struct StreamDetailView: View {
     @Binding var doc: TraceDocument
     @Binding var streamIds: Set<Stream.ID>
-    @Binding var tab: DocumentView.Tab
     
     var window: Range<Int> = 0..<100
     

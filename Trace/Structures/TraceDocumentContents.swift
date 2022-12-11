@@ -21,19 +21,19 @@ struct TraceDocumentContents: Identifiable, Codable {
     
     // MARK: PROPERTIES
     /// The subject name..
-    var subject: String?
+    var subject: String = ""
     /// Information relating to the subject.
-    var info: String?
+    var info: String = ""
     
     /// An array containing the streams of EEG data for each electrode in the trace.
     var streams: [Stream]
     /// The sample rate of the EEG data, measured in Hertz, Hz.
     var sampleRate: Double
     /// A dictionary containing each event type and their events as indexes.
-    var events: [String: [Int]]?
+    var events: [String: [Int]] = [:]
     
     /// Length of an event epoch in the number of samples post event stamp.
-    var epochLength: Int?
+    var epochLength: Int = 100
     
     // MARK: COMPUTED PROPERTIES
     /// The number of samples.

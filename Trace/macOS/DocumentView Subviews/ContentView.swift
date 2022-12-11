@@ -17,10 +17,10 @@ struct ContentView: View {
         Group {
             switch tab {
             case .streams: StreamsView(doc: $doc, streamIds: $streamIds)
-            case .events: EmptyView()
+            case .events: EventsView(doc: $doc)
             case .scalpMap: VisualiseView(doc: $doc)
             case .plot: PlotView()
-            case .study: EmptyView()
+            case .study: StudyView(doc: $doc)
             }
         }
         .navigationSubtitle("\(doc.contents.streams.count) stream\(doc.contents.streams.count == 1 ? "" : "s")")

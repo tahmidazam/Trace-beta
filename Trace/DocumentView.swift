@@ -374,7 +374,6 @@ struct DocumentView: View {
     @State var streamIds: Set<Stream.ID> = []
     
     var body: some View {
-        
         NavigationSplitView {
             SidebarView(tab: $tab)
         } detail: {
