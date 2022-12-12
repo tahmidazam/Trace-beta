@@ -26,14 +26,14 @@ struct VisualiseView: View {
             
             electrodeLabels
         }
-        .toolbar {
-            ToolbarItemGroup {
-                stepBackward10Button
-                stepBackward1Button
-                stepForward1Button
-                stepForward10Button
-            }
-        }
+//        .toolbar {
+//            ToolbarItemGroup {
+//                stepBackward10Button
+//                stepBackward1Button
+//                stepForward1Button
+//                stepForward10Button
+//            }
+//        }
     }
     
     var electrodeLabels: some View {

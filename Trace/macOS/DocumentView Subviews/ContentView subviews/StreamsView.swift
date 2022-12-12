@@ -21,48 +21,6 @@ struct StreamsView: View {
     }
     
     var content: some View {
-//        Table(doc.contents.streams, selection: $streamIds) {
-//            TableColumn("") { stream in
-//                Group {
-//                    switch stream.electrode.generalArea {
-//                    case .left: Image(systemName: "circle.lefthalf.filled")
-//                    case .central: Image(systemName: "circle.and.line.horizontal").rotationEffect(.degrees(90))
-//                    case .right: Image(systemName: "circle.righthalf.filled")
-//                    }
-//                }
-//                .frame(width: 30.0)
-//            }
-//
-//            TableColumn("Symbol") { stream in
-//                Text(stream.electrode.symbol)
-//            }
-//
-//            TableColumn("Prefix") { stream in
-//                Text(stream.electrode.prefix.rawValue)
-//                    .foregroundColor(.secondary)
-//            }
-//
-//            TableColumn("General area") { stream in
-//                Text(stream.electrode.generalArea.rawValue)
-//                    .foregroundColor(.secondary)
-//            }
-//
-//            TableColumn("Minimum") { stream in
-//                if let potentialRange = stream.potentialRange {
-//                    Text(potentialRange.lowerBound.format())
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-//
-//            TableColumn("Maximum") { stream in
-//                if let potentialRange = stream.potentialRange {
-//                    Text(potentialRange.upperBound.format())
-//                        .foregroundColor(.secondary)
-//                }
-//            }
-//        }
-        
-        
         List(selection: $streamIds) {
             ForEach(Electrode.Prefix.allCases) { electrodePrefix in
                 Section(electrodePrefix.rawValue.capitalized) {
