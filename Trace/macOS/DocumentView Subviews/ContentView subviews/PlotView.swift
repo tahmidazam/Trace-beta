@@ -136,6 +136,24 @@ struct PlotView: View {
                                 .position(x: ((proxy.size.width) * chartWidthScaleFactor) / 2, y: y)
                             }
                         }
+                        
+                        Canvas { context, size in
+                            if let sampleCount = doc.contents.sampleCount {
+                                for event in doc.contents.events {
+                                    let timeProportion = Double(event.sampleIndex + 1) / Double(sampleCount)
+                                    
+                                    let x = size.width * timeProportion
+                                    
+                                    let linePath: Path = Path { path in
+                                        path.move(to: CGPoint(x: x, y: 0))
+                                        path.addLine(to: CGPoint(x: x, y: size.height))
+                                    }
+                                    
+                                    context.stroke(linePath, with: .color(.red), lineWidth: 2.0)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }
             }

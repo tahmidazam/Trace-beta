@@ -30,8 +30,9 @@ struct TraceDocumentContents: Identifiable, Codable {
     /// The sample rate of the EEG data, measured in Hertz, Hz.
     var sampleRate: Double
     /// A dictionary containing each event type and their events as indexes.
-    var events: [String: [Int]] = [:]
+    var events: [Event] = []
     
+    var eventTypes: [String] = []
     /// Length of an event epoch in the number of samples post event stamp.
     var epochLength: Int = 100
     

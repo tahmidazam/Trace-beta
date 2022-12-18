@@ -23,7 +23,6 @@ struct ContentView: View {
             case .study: StudyView(doc: $doc)
             }
         }
-        .navigationSubtitle("\(doc.contents.streams.count) stream\(doc.contents.streams.count == 1 ? "" : "s")")
     }
 }
 #endif
