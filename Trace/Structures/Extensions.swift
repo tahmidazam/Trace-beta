@@ -97,9 +97,77 @@ extension Double {
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 3
         formatter.usesGroupingSeparator = false
+        formatter.minimumFractionDigits = 4
+        formatter.maximumFractionDigits = 4
         
         let number = NSNumber(value: self)
         let formattedValue = formatter.string(from: number)!
         return formattedValue
     }
 }
+
+#if os(macOS)
+extension View {
+    func trackMouse(onMove: @escaping (NSPoint) -> ()) -> some View {
+        TrackingAreaView(onMove: onMove) {
+            self
+        }
+    }
+}
+
+struct TrackingAreaView<Content>: View where Content: View {
+    let onMove: (NSPoint) -> ()
+    let content: () -> Content
+    
+    init(onMove: @escaping (NSPoint) -> (), @ViewBuilder content: @escaping () -> Content) {
+        self.onMove = onMove
+        self.content = content
+    }
+    
+    var body: some View {
+        TrackingAreaRepresentable(onMove: onMove, content: self.content())
+    }
+}
+
+struct TrackingAreaRepresentable<Content>: NSViewRepresentable where Content: View {
+    let onMove: (NSPoint) -> ()
+    let content: Content
+    
+    func makeNSView(context: Context) -> some NSHostingView<Content> {
+        return TrackingNSHostingView(onMove: onMove, rootView: self.content)
+    }
+    
+    func updateNSView(_ nsView: NSViewType, context: Context) {
+        
+    }
+}
+
+class TrackingNSHostingView<Content>: NSHostingView<Content> where Content : View {
+    let onMove: (NSPoint) -> Void
+    
+    init(onMove: @escaping (NSPoint) -> Void, rootView: Content) {
+        self.onMove = onMove
+        super.init(rootView: rootView)
+        
+        setupTrackingArea()
+    }
+    
+    required init(rootView: Content) {
+        fatalError("init(rootView:) has not been implemented")
+    }
+    
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func setupTrackingArea() {
+        let options: NSTrackingArea.Options = [.mouseMoved, .activeAlways, .inVisibleRect]
+        self.addTrackingArea(NSTrackingArea.init(rect: .zero, options: options, owner: self, userInfo: nil))
+    }
+        
+    override func mouseMoved(with event: NSEvent) {
+        self.onMove(self.convert(event.locationInWindow, from: nil))
+    }
+}
+
+#endif
