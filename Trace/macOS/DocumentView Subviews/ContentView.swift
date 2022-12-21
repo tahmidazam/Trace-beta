@@ -19,7 +19,7 @@ struct ContentView: View {
             case .streams: StreamsView(doc: $doc, streamIds: $streamIds)
             case .events: EventsView(doc: $doc)
             case .scalpMap: VisualiseView(doc: $doc)
-            case .plot: PlotView(doc: $doc)
+            case .plot: StackedPlotView(doc: $doc)
             case .study: StudyView(doc: $doc)
             }
         }

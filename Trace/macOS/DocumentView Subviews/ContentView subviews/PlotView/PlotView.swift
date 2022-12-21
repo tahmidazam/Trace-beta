@@ -163,14 +163,7 @@ struct PlotView: View {
                 }
             }
         }
-        .onHover(perform: { isHovering in
-            if !isHovering {
-                mouseLocation = nil
-            }
-        })
-        .trackMouse { location in
-            mouseLocation = CGPoint(x: location.x, y: location.y)
-        }
+        
     }
 }
 
