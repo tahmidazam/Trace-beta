@@ -25,8 +25,8 @@ struct ChartView: View {
     @State var windowSize: Int = 100
     @State var windowStart: Int = 0
     
-    var window: Range<Int> {
-        windowStart..<(windowStart + windowSize)
+    var window: ClosedRange<Int> {
+        windowStart...(windowStart + windowSize)
     }
     var timeWindow: Range<Double> {
         doc.contents.time(at: window.lowerBound)..<doc.contents.time(at: window.upperBound)

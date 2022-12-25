@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(macOS)
 struct EventsView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var doc: TraceDocument
@@ -151,3 +152,4 @@ struct EventsView: View {
         })))
     }
 }
+#endif

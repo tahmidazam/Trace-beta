@@ -9,6 +9,7 @@ import SwiftUI
 import simd
 import CoreImage
 
+#if os(macOS)
 struct Renderer: View {
     @Binding var doc: TraceDocument
     
@@ -78,3 +79,4 @@ struct Renderer: View {
     }
 }
 
+#endif

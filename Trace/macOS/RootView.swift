@@ -8,6 +8,7 @@
 import SwiftUI
 import Charts
 
+#if os(macOS)
 struct RootView: View {
     @Binding var doc: TraceDocument
     
@@ -924,3 +925,4 @@ struct RootView: View {
 }
 
 
+#endif
