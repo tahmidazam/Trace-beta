@@ -359,32 +359,11 @@ struct DocumentView: View {
         doc.contents.streams = streams
     }
 }
-#else
-
-struct DocumentView: View {
-    @Binding var doc: TraceDocument
-    
-    @State var tab: Tab = Tab.streams
-    enum Tab: String, Identifiable, CaseIterable {
-        var id: Self { self }
-        
-        case streams, events, scalpMap, plot, study
-    }
-    
-    @State var streamIds: Set<Stream.ID> = []
-    
-    var body: some View {
-        NavigationSplitView {
-            SidebarView(tab: $tab)
-        } detail: {
-            ContentView(doc: $doc, streamIds: $streamIds, tab: $tab)
-        }
-    }
-}
-#endif
 
 struct DocumentView_Previews: PreviewProvider {
     static var previews: some View {
         DocumentView(doc: .constant(TraceDocument(trace: TraceDocumentContents(streams: [Stream(electrode: Electrode(prefix: .frontal, suffix: 1), samples: []), Stream(electrode: Electrode(prefix: .central, suffix: 2), samples: [])], sampleRate: 200))))
     }
 }
+#endif
+

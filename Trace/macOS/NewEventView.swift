@@ -16,71 +16,65 @@ struct NewEventView: View {
     @State var eventType: String = ""
     
     var body: some View {
-        VStack(spacing: 0.0) {
-            VStack(alignment: .leading) {
-                Text("New event")
-                    .font(.headline)
-                
-                Text("Mark a sample/timestamp with an event to enable epoching.")
-                    .fixedSize(horizontal: false, vertical: true)
-                
-                GroupBox {
-                    VStack(spacing: 0.0) {
-                        HStack {
-                            Text("Event type")
-                            
-                            Spacer()
-                            
-                            Picker("", selection: $eventType) {
-                                ForEach(doc.contents.eventTypes, id: \.self) { eventType in
-                                    Text(eventType).tag(eventType)
-                                }
+        VStack(alignment: .leading) {
+            Text("New event")
+                .font(.headline)
+            
+            Text("Mark a sample/timestamp with an event to enable epoching.")
+                .fixedSize(horizontal: false, vertical: true)
+            
+            GroupBox {
+                VStack(spacing: 0.0) {
+                    HStack {
+                        Text("Event type")
+                        
+                        Spacer()
+                        
+                        Picker("", selection: $eventType) {
+                            ForEach(doc.contents.eventTypes, id: \.self) { eventType in
+                                Text(eventType).tag(eventType)
                             }
-                            .labelsHidden()
-                            .frame(width: 150)
                         }
-                        .padding(5)
-                        
-                        Divider()
-                        
-                        HStack {
-                            Text("Event sample")
-                            
-                            Spacer()
-                            
-                            TextField("Enter sample number", text: $event)
-                                .frame(width: 150)
-                        }
-                        .padding(5)
+                        .labelsHidden()
+                        .frame(width: 150)
                     }
+                    .padding(5)
+                    
+                    Divider()
+                    
+                    HStack {
+                        Text("Event sample")
+                        
+                        Spacer()
+                        
+                        TextField("Enter sample number", text: $event)
+                            .frame(width: 150)
+                    }
+                    .padding(5)
                 }
-                .padding(.top)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            
-            Divider()
-            
-            HStack {
+            .padding(.top)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .toolbar {
+            ToolbarItemGroup(placement: .cancellationAction) {
                 Button("Cancel", action: cancel)
-                    .keyboardShortcut(.cancelAction)
-                
-                Spacer()
-                
+            }
+            
+            ToolbarItemGroup(placement: .confirmationAction) {
                 Button("Add event", action: addEvent)
-                    .keyboardShortcut(.defaultAction)
                     .disabled(eventIsInvalid)
             }
-            .padding()
         }
-            .frame(minWidth: 300)
-            .task {
-                guard let firstEventType = doc.contents.eventTypes.first else {
-                    return
-                }
-                
-                eventType = firstEventType
+        .frame(width: 400)
+        .task {
+            guard let firstEventType = doc.contents.eventTypes.first else {
+                return
             }
+            
+            eventType = firstEventType
+        }
     }
     
     func cancel() {

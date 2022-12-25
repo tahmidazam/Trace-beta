@@ -18,13 +18,14 @@ import SwiftUI
 struct TraceApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: TraceDocument()) { file in
-            DocumentView(doc: file.$document)
+            RootView(doc: file.$document)
+//            DocumentView(doc: file.$document)
                 .task {
                     file.document.contents.streams.sort { lhs, rhs in
                         if lhs.electrode.prefix == rhs.electrode.prefix {
                             return lhs.electrode.suffix < rhs.electrode.suffix
                         }
-                        
+
                         return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
                     }
                 }

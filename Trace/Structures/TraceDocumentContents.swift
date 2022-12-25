@@ -63,6 +63,14 @@ struct TraceDocumentContents: Identifiable, Codable {
         
     }
     
+    var absoluteYLimit: Double {
+        guard let potentialRange = potentialRange else {
+            return 0.0
+        }
+        
+        return max(abs(potentialRange.lowerBound), abs(potentialRange.upperBound))
+    }
+    
     var potentialRange: ClosedRange<Double>? {
         let allSamples = streams.map { stream in
             return stream.samples
@@ -178,17 +186,44 @@ struct TraceDocumentContents: Identifiable, Codable {
         
         return streams
     }
+    static func events(from csv: String, sampleRate: Double, sampleCount: Int) -> [Event]? {
+        var events: [Event] = []
+        
+        var lines = csv.components(separatedBy: .newlines).filter { $0 != "" }
+        
+        let _ = lines.remove(at: 0)
+        
+        for line in lines {
+            let event = line.components(separatedBy: ",")
+            
+            let eventType = event[0]
+            let eventLatency = event[1].filter { $0.isNumber || $0 == "." || $0 == "-"}
+            
+            guard let eventLatency = Double(eventLatency) else { return nil }
+            
+            let sampleNumber = Int(round(eventLatency / (1 / sampleRate)))
+            
+            print(sampleNumber)
+            
+            if (0...sampleCount).contains(sampleNumber) {
+                events.append(Event(sampleIndex: sampleNumber - 1, type: eventType))
+            }
+        }
+        
+        return events
+    }
+    
     /// Converts a stream to a chart-parsable data structure.
     /// - Parameters:
     ///   - stream: The stream to map.
     ///   - sampleRate: The sample rate of the stream.
     /// - Returns: A chart-parsable stream.
-    static func sampleDataPoints(from streams: [Stream], sampleRate: Double, spliced: Range<Int>? = nil) -> [TraceDocumentContents.SampleDataPoint] {
+    static func sampleDataPoints(from streams: [Stream], sampleRate: Double, spliced: ClosedRange<Int>? = nil) -> [TraceDocumentContents.SampleDataPoint] {
         var data: [TraceDocumentContents.SampleDataPoint] = []
         
         for stream in streams {
             if spliced != nil {
-                for sampleIndex in spliced!.lowerBound..<min(stream.samples.count, spliced!.upperBound) {
+                for sampleIndex in spliced!.lowerBound...min(stream.samples.count, spliced!.upperBound) {
                     let dataPoint = TraceDocumentContents.SampleDataPoint(
                         electrode: stream.electrode,
                         timestamp: (1 / sampleRate) * Double(sampleIndex),

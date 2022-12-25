@@ -41,12 +41,10 @@ struct StreamDetailView: View {
     @Binding var doc: TraceDocument
     @Binding var streamIds: Set<Stream.ID>
     
-    var window: Range<Int> = 0..<100
-    
     var body: some View {
         Chart(TraceDocumentContents.sampleDataPoints(from: doc.contents.streams.filter({ stream in
             streamIds.contains(stream.id)
-        }), sampleRate: doc.contents.sampleRate, spliced: window)) { point in
+        }), sampleRate: doc.contents.sampleRate)) { point in
             LineMark(
                 x: .value("time/s", point.timestamp),
                 y: .value("potential/mV", point.potential)

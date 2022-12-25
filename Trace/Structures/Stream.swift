@@ -35,7 +35,7 @@ struct Stream: Identifiable, Codable, Hashable {
         return min...max
     }
     
-    #if os(iOS)
+#if os(iOS)
     // MARK: FUNCTIONS
     /// Calculates the colour to render a scalp map segment at a given index.
     /// - Parameter index: The index to calculate the color of.
@@ -56,7 +56,7 @@ struct Stream: Identifiable, Codable, Hashable {
             return Color(uiColor: negativeColors.intermediate(percentage: prop))
         }
     }
-    #else
+#else
     // MARK: FUNCTIONS
     /// Calculates the colour to render a scalp map segment at a given index.
     /// - Parameter index: The index to calculate the color of.
@@ -77,7 +77,48 @@ struct Stream: Identifiable, Codable, Hashable {
             return Color(nsColor: negativeColors.intermediate(percentage: prop))
         }
     }
-    #endif
+    
+    func path(
+        plotSize: CGSize,
+        verticalPaddingProportion: Double,
+        rowCount: Int,
+        rowIndex: Int,
+        globalPotentialRange: ClosedRange<Double>,
+        firstSampleIndex: Int,
+        plottingWindowSize: Int
+    ) -> Path {
+        let maxAbsolutePotential = max(abs(globalPotentialRange.lowerBound), abs(globalPotentialRange.upperBound))
+        
+        let rowHeight: CGFloat = (plotSize.height * (1 - verticalPaddingProportion)) / Double(rowCount)
+        
+        let minY = (plotSize.height * verticalPaddingProportion / 2) + rowHeight * CGFloat(rowIndex)
+        
+        
+        let xStep = plotSize.width / CGFloat(plottingWindowSize - 1)
+        
+        let sampleIndexRange = (firstSampleIndex...(firstSampleIndex + plottingWindowSize - 1))
+        
+        let points: [CGPoint] = sampleIndexRange.enumerated().map { index, sampleIndex in
+            let potential = samples[sampleIndex]
+            
+            let x = xStep * CGFloat(index)
+            
+            let absolutePotential = abs(potential)
+            let sign = potential / absolutePotential * -1
+            let distanceFromEquilibrium = (potential / maxAbsolutePotential) * (rowHeight / 2)
+            
+            let y = (minY + rowHeight / 2) + (sign * distanceFromEquilibrium)
+            
+            return CGPoint(x: x, y: y)
+        }
+        
+        let path = Path { path in
+            path.addLines(points)
+        }
+        
+        return path
+    }
+#endif
     
     // MARK: STATIC FUNCTIONS
     /// Import samples of potentials from a text input.
@@ -96,7 +137,7 @@ struct Stream: Identifiable, Codable, Hashable {
         guard components.count == samples.count else {
             return nil
         }
-
+        
         return samples
     }
     /// Converts samples to a chart-parsable data structure.
