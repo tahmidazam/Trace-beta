@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		C608E9DF294E35D2009ADDB4 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = C608E9DE294E35D2009ADDB4 /* Event.swift */; };
 		C60A59F12957373E00A2E682 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C60A59F02957373E00A2E682 /* RootView.swift */; };
+		C63DACCA2959F7430013EBCF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACC92959F7430013EBCF /* OnboardingView.swift */; };
+		C63DACCC2959F8B80013EBCF /* DetailPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACCB2959F8B80013EBCF /* DetailPickerView.swift */; };
+		C63DACCE2959F90F0013EBCF /* StreamsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACCD2959F90F0013EBCF /* StreamsDetailView.swift */; };
+		C63DACD02959F9160013EBCF /* PlotDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACCF2959F9160013EBCF /* PlotDetailView.swift */; };
+		C63DACD22959F91C0013EBCF /* EventsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACD12959F91C0013EBCF /* EventsDetailView.swift */; };
+		C63DACD42959FA590013EBCF /* StackedPlotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACD32959FA590013EBCF /* StackedPlotView.swift */; };
+		C63DACD62959FB6A0013EBCF /* ScalpMapVisualisationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63DACD52959FB6A0013EBCF /* ScalpMapVisualisationView.swift */; };
 		C67DE079289F9599004A5D75 /* TraceDocumentContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE078289F9599004A5D75 /* TraceDocumentContents.swift */; };
 		C67DE07B289F95C2004A5D75 /* CompressedTraceDocumentContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07A289F95C2004A5D75 /* CompressedTraceDocumentContents.swift */; };
 		C67DE07D289F95D7004A5D75 /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07C289F95D7004A5D75 /* Stream.swift */; };
@@ -56,6 +63,13 @@
 /* Begin PBXFileReference section */
 		C608E9DE294E35D2009ADDB4 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		C60A59F02957373E00A2E682 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		C63DACC92959F7430013EBCF /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		C63DACCB2959F8B80013EBCF /* DetailPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailPickerView.swift; sourceTree = "<group>"; };
+		C63DACCD2959F90F0013EBCF /* StreamsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamsDetailView.swift; sourceTree = "<group>"; };
+		C63DACCF2959F9160013EBCF /* PlotDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlotDetailView.swift; sourceTree = "<group>"; };
+		C63DACD12959F91C0013EBCF /* EventsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsDetailView.swift; sourceTree = "<group>"; };
+		C63DACD32959FA590013EBCF /* StackedPlotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackedPlotView.swift; sourceTree = "<group>"; };
+		C63DACD52959FB6A0013EBCF /* ScalpMapVisualisationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScalpMapVisualisationView.swift; sourceTree = "<group>"; };
 		C67DE078289F9599004A5D75 /* TraceDocumentContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraceDocumentContents.swift; sourceTree = "<group>"; };
 		C67DE07A289F95C2004A5D75 /* CompressedTraceDocumentContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressedTraceDocumentContents.swift; sourceTree = "<group>"; };
 		C67DE07C289F95D7004A5D75 /* Stream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
@@ -113,6 +127,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C63DACC82959F7200013EBCF /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				C60A59F02957373E00A2E682 /* RootView.swift */,
+				C63DACC92959F7430013EBCF /* OnboardingView.swift */,
+				C63DACCB2959F8B80013EBCF /* DetailPickerView.swift */,
+				C63DACCD2959F90F0013EBCF /* StreamsDetailView.swift */,
+				C63DACCF2959F9160013EBCF /* PlotDetailView.swift */,
+				C63DACD12959F91C0013EBCF /* EventsDetailView.swift */,
+				C63DACD32959FA590013EBCF /* StackedPlotView.swift */,
+				C63DACD52959FB6A0013EBCF /* ScalpMapVisualisationView.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
 		C67DE082289F9EFC004A5D75 /* Structures */ = {
 			isa = PBXGroup;
 			children = (
@@ -130,7 +159,7 @@
 		C6CE2B2D2932C65200E0DD61 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
-				C60A59F02957373E00A2E682 /* RootView.swift */,
+				C63DACC82959F7200013EBCF /* Root */,
 				C69DB9CB29454355006C52FA /* EventsView.swift */,
 				C6CABC92294FC5D50066D81D /* NewEventTypeView.swift */,
 				C6CABC94294FCA430066D81D /* NewEventView.swift */,
@@ -349,26 +378,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */,
+				C63DACCE2959F90F0013EBCF /* StreamsDetailView.swift in Sources */,
 				C6DC5BA52874B795007B679C /* TraceDocument.swift in Sources */,
 				C67DE079289F9599004A5D75 /* TraceDocumentContents.swift in Sources */,
 				C60A59F12957373E00A2E682 /* RootView.swift in Sources */,
+				C63DACD42959FA590013EBCF /* StackedPlotView.swift in Sources */,
 				C6DC5BD52874C0A5007B679C /* NewStreamView.swift in Sources */,
 				C6CABC95294FCA430066D81D /* NewEventView.swift in Sources */,
 				C608E9DF294E35D2009ADDB4 /* Event.swift in Sources */,
+				C63DACD62959FB6A0013EBCF /* ScalpMapVisualisationView.swift in Sources */,
 				C69DB9CC29454355006C52FA /* EventsView.swift in Sources */,
 				C6CABC93294FC5D50066D81D /* NewEventTypeView.swift in Sources */,
 				C6DC5BD92874C9DE007B679C /* ImportFromTextView.swift in Sources */,
 				C67DE07B289F95C2004A5D75 /* CompressedTraceDocumentContents.swift in Sources */,
 				C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */,
 				C67DE07D289F95D7004A5D75 /* Stream.swift in Sources */,
+				C63DACCC2959F8B80013EBCF /* DetailPickerView.swift in Sources */,
 				C6B8BA90289478DE00473F34 /* ScalpMapView.swift in Sources */,
 				C6B8BA9228947EC300473F34 /* ChartView.swift in Sources */,
+				C63DACD22959F91C0013EBCF /* EventsDetailView.swift in Sources */,
 				C69999092950F67800B00C36 /* Renderer.swift in Sources */,
 				C6B8BA8C289471C300473F34 /* StreamDetailView.swift in Sources */,
 				C6DC5BA32874B795007B679C /* TraceApp.swift in Sources */,
+				C63DACD02959F9160013EBCF /* PlotDetailView.swift in Sources */,
 				C6C8D9A9294660DC00AC1FA1 /* StudyView.swift in Sources */,
 				C67DE07F289F99F2004A5D75 /* Electrode.swift in Sources */,
 				C67DE084289F9F63004A5D75 /* Documentation.docc in Sources */,
+				C63DACCA2959F7430013EBCF /* OnboardingView.swift in Sources */,
 				C67DE081289F9EB9004A5D75 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

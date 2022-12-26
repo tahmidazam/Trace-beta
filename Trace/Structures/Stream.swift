@@ -109,7 +109,11 @@ struct Stream: Identifiable, Codable, Hashable {
             
             let y = (minY + rowHeight / 2) + (sign * distanceFromEquilibrium)
             
-            return CGPoint(x: x, y: y)
+            if y.isNaN {
+                return CGPoint(x: x, y: (minY + rowHeight / 2))
+            } else {
+                return CGPoint(x: x, y: y)
+            }
         }
         
         let path = Path { path in

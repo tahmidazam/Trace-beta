@@ -355,8 +355,19 @@ struct DocumentView: View {
         guard let url = urls.first else { alert = .fileImportFailure; return }
         guard let rawText = try? String(contentsOf: url) else { alert = .fileImportFailure; return }
         guard let streams = TraceDocumentContents.streams(from: rawText) else {  alert = .csvFormatInvalid; return }
-    
+        
         doc.contents.streams = streams
+        
+        let allSamples = doc.contents.streams.map { stream in
+            return stream.samples
+        }.flatMap({ (element: [Double]) -> [Double] in
+            return element
+        })
+
+        guard let min = allSamples.min() else {  alert = .csvFormatInvalid; return }
+        guard let max = allSamples.max() else {  alert = .csvFormatInvalid; return }
+        
+        doc.contents.potentialRange = min...max
     }
 }
 

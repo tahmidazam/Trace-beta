@@ -36,6 +36,8 @@ struct TraceDocumentContents: Identifiable, Codable {
     /// Length of an event epoch in the number of samples post event stamp.
     var epochLength: Int = 100
     
+    var potentialRange: ClosedRange<Double>?
+    
     // MARK: COMPUTED PROPERTIES
     /// The number of samples.
     var sampleCount: Int? {
@@ -69,19 +71,6 @@ struct TraceDocumentContents: Identifiable, Codable {
         }
         
         return max(abs(potentialRange.lowerBound), abs(potentialRange.upperBound))
-    }
-    
-    var potentialRange: ClosedRange<Double>? {
-        let allSamples = streams.map { stream in
-            return stream.samples
-        }.flatMap({ (element: [Double]) -> [Double] in
-            return element
-        })
-        
-        guard let min = allSamples.min() else { return nil }
-        guard let max = allSamples.max() else { return nil }
-        
-        return min...max
     }
     
     var prefixes: [Electrode.Prefix] {
