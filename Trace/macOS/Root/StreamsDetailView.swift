@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StreamsDetailView: View {
     @Binding var doc: TraceDocument
-    @Binding var selectedStreams: [Stream]
+    @ObservedObject var plottingState: PlottingState
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -31,15 +31,15 @@ struct StreamsDetailView: View {
                             ForEach(filteredStreams) { stream in
                                 HStack {
                                     Button {
-                                        if selectedStreams.contains(stream) {
-                                            selectedStreams.removeAll { stream_ in
+                                        if plottingState.selectedStreams.contains(stream) {
+                                            plottingState.selectedStreams.removeAll { stream_ in
                                                 stream_.id == stream.id
                                             }
                                         } else {
-                                            selectedStreams.append(stream)
+                                            plottingState.selectedStreams.append(stream)
                                         }
                                     } label: {
-                                        if selectedStreams.contains(stream) {
+                                        if plottingState.selectedStreams.contains(stream) {
                                             Image(systemName: "circle.inset.filled")
                                                 .foregroundColor(.accentColor)
                                         } else {
@@ -69,11 +69,11 @@ struct StreamsDetailView: View {
                 
                 HStack {
                     Button("Deselect all") {
-                        selectedStreams = []
+                        plottingState.selectedStreams = []
                     }
                     
                     Button("Select all") {
-                        selectedStreams = doc.contents.streams
+                        plottingState.selectedStreams = doc.contents.streams
                     }
                     
                     Spacer()

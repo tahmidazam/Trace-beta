@@ -9,22 +9,18 @@ import SwiftUI
 
 struct PlotDetailView: View {
     @Binding var doc: TraceDocument
-    @Binding var visualisation: RootView.Visualisation
-    @Binding var plottingWindowSampleSize: Int
-    @Binding var showElectrodeLabels: Bool
-    @Binding var showElectrodePotentials: Bool
-    @Binding var lineWidth: CGFloat
+    @ObservedObject var plottingState: PlottingState
     
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0.0) {
                 LabeledContent {
-                    Picker("", selection: $visualisation) {
+                    Picker("", selection: $plottingState.visualisation) {
                         Label("Stacked plot", systemImage: "chart.bar.doc.horizontal")
-                            .tag(RootView.Visualisation.stackedPlot)
+                            .tag(PlottingState.Visualisation.stackedPlot)
                         
                         Label("Scalp map", systemImage: "circle.dashed")
-                            .tag(RootView.Visualisation.scalpMap)
+                            .tag(PlottingState.Visualisation.scalpMap)
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
@@ -38,10 +34,10 @@ struct PlotDetailView: View {
                 
                 Divider()
                 
-                switch visualisation {
+                switch plottingState.visualisation {
                 case .stackedPlot:
                     LabeledContent {
-                        Stepper("\(plottingWindowSampleSize)", value: $plottingWindowSampleSize, in: 50...500, step: 50)
+                        Stepper("\(plottingState.windowSize)", value: $plottingState.windowSize, in: 50...500, step: 50)
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     } label: {
                         Text("Plotting window size")
@@ -52,7 +48,7 @@ struct PlotDetailView: View {
                     Divider()
                     
                     LabeledContent {
-                        Stepper("\(lineWidth)", value: $lineWidth, in: 1.0...5.0, step: 0.5)
+                        Stepper("\(plottingState.lineWidth)", value: $plottingState.lineWidth, in: 1.0...5.0, step: 0.5)
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     } label: {
                         Text("Plot line width")
@@ -62,12 +58,12 @@ struct PlotDetailView: View {
                     Divider()
                 case .scalpMap:
                     VStack {
-                        Toggle(isOn: $showElectrodeLabels) {
+                        Toggle(isOn: $plottingState.showElectrodeLabels) {
                             Text("Show electrode labels")
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        Toggle(isOn: $showElectrodePotentials) {
+                        Toggle(isOn: $plottingState.showElectrodePotentials) {
                             Text("Show electrode potentials")
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)

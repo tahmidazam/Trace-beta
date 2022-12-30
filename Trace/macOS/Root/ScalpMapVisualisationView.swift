@@ -9,25 +9,16 @@ import SwiftUI
 
 struct ScalpMapVisualisationView: View {
     @Binding var doc: TraceDocument
-    @Binding var selectedStreams: [Stream]
-    @Binding var scalpMapSampleIndexToDisplay: Int
-    @Binding var showElectrodeLabels: Bool
-    @Binding var showElectrodePotentials: Bool
-    @Binding var showEpochs: Bool
-    @Binding var selectedEventTypes: [String]
-    @Binding var lineWidth: CGFloat
-    @Binding var plottingWindowSampleSize: Int
-    @Binding var plottingWindowFirstSampleIndex: Int
-    @Binding var visualisation: RootView.Visualisation
-    
+    @ObservedObject var plottingState: PlottingState
+
     var body: some View {
         VStack(spacing: 0.0) {
             ZStack {
                 Canvas { context, size in
-                    for stream in selectedStreams {
+                    for stream in plottingState.selectedStreams {
                         if let sector = stream.electrode.sector(in: size),
                            let potentialRange = doc.contents.potentialRange,
-                           let color = stream.color(at: scalpMapSampleIndexToDisplay, globalPotentialRange: potentialRange) {
+                           let color = stream.color(at: plottingState.sampleIndex, globalPotentialRange: potentialRange) {
                             context.fill(sector, with: .color(color))
                         }
                     }
@@ -40,7 +31,7 @@ struct ScalpMapVisualisationView: View {
             Divider()
             
             VStack {
-                TimelineView(doc: $doc, selectedEventTypes: $selectedEventTypes, lineWidth: $lineWidth, showEpochs: $showEpochs, plottingWindowSampleSize: $plottingWindowSampleSize, plottingWindowFirstSampleIndex: $plottingWindowFirstSampleIndex, visualisation: $visualisation, scalpMapSampleIndexToDisplay: $scalpMapSampleIndexToDisplay)
+                TimelineView(doc: $doc, plottingState: plottingState)
 
                 
                 scalpMapBottomBar
@@ -51,14 +42,14 @@ struct ScalpMapVisualisationView: View {
     var electrodeLabels: some View {
         GeometryReader { proxy in
             ZStack {
-                ForEach(selectedStreams) { stream in
+                ForEach(plottingState.selectedStreams) { stream in
                     if let location = stream.electrode.location?.cgPoint(in: proxy.size) {
                         VStack {
-                            if showElectrodeLabels {
+                            if plottingState.showElectrodeLabels {
                                 Text(stream.electrode.symbol).font(.headline)
                             }
-                            if showElectrodePotentials {
-                                Text("\(stream.samples[scalpMapSampleIndexToDisplay].format())").font(.system(.caption, design:.monospaced))
+                            if plottingState.showElectrodePotentials {
+                                Text("\(stream.samples[plottingState.sampleIndex].format())").font(.system(.caption, design:.monospaced))
                             }
                         }
                         .position(x: location.x, y: location.y)
@@ -85,12 +76,12 @@ struct ScalpMapVisualisationView: View {
                         .font(.headline)
                         .foregroundColor(.secondary)
                     
-                    Text("\(scalpMapSampleIndexToDisplay + 1)")
+                    Text("\(plottingState.sampleIndex + 1)")
                         .font(.system(.title2, design: .monospaced))
                 }
                 
                 HStack(alignment: .firstTextBaseline, spacing: 0.0) {
-                    Text("\(doc.contents.time(at: scalpMapSampleIndexToDisplay).format())")
+                    Text("\(doc.contents.time(at: plottingState.sampleIndex).format())")
                         .font(.system(.body, design: .monospaced))
                     
                     Text(" s")
@@ -112,32 +103,32 @@ struct ScalpMapVisualisationView: View {
     
     var stepBackward1Button: some View {
         Button(action: {
-            scalpMapSampleIndexToDisplay -= 1
+            plottingState.sampleIndex -= 1
         }) {
             Image(systemName: "backward.frame.fill")
-        }.disabled(scalpMapSampleIndexToDisplay - 1 < 0)
+        }.disabled(plottingState.sampleIndex - 1 < 0)
     }
     var stepBackward10Button: some View {
         Button(action: {
-            scalpMapSampleIndexToDisplay -= 10
+            plottingState.sampleIndex -= 10
         }) {
             Image(systemName: "gobackward.10")
-        }.disabled(scalpMapSampleIndexToDisplay - 10 < 0)
+        }.disabled(plottingState.sampleIndex - 10 < 0)
     }
     var stepForward1Button: some View {
         Button(action: {
-            scalpMapSampleIndexToDisplay += 1
+            plottingState.sampleIndex += 1
         }) {
             Image(systemName: "forward.frame.fill")
         }
-        .disabled(scalpMapSampleIndexToDisplay + 1 > doc.contents.sampleCount ?? 0)
+        .disabled(plottingState.sampleIndex + 1 > doc.contents.sampleCount ?? 0)
     }
     var stepForward10Button: some View {
         Button(action: {
-            scalpMapSampleIndexToDisplay += 10
+            plottingState.sampleIndex += 10
         }) {
             Image(systemName: "goforward.10")
         }
-        .disabled(scalpMapSampleIndexToDisplay + 10 > doc.contents.sampleCount ?? 0)
+        .disabled(plottingState.sampleIndex + 10 > doc.contents.sampleCount ?? 0)
     }
 }

@@ -9,21 +9,15 @@ import SwiftUI
 
 struct TimelineView: View {
     @Binding var doc: TraceDocument
-    @Binding var selectedEventTypes: [String]
-    @Binding var lineWidth: CGFloat
-    @Binding var showEpochs: Bool
-    @Binding var plottingWindowSampleSize: Int
-    @Binding var plottingWindowFirstSampleIndex: Int
-    @Binding var visualisation: RootView.Visualisation
-    @Binding var scalpMapSampleIndexToDisplay: Int
-    
+    @ObservedObject var plottingState: PlottingState
+
     var body: some View {
         Canvas { context, size in
             context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(.quaternaryLabelColor)))
             
             if let sampleCount = doc.contents.sampleCount {
                 for event in doc.contents.events.filter({ event in
-                    selectedEventTypes.contains(event.type)
+                    plottingState.selectedEventTypes.contains(event.type)
                 }) {
                     let timeProportion = CGFloat(event.sampleIndex + 1) / CGFloat(sampleCount)
                     
@@ -34,9 +28,9 @@ struct TimelineView: View {
                         path.addLine(to: CGPoint(x: x, y: size.height))
                     }
                     
-                    context.stroke(linePath, with: .color(.red), lineWidth: lineWidth)
+                    context.stroke(linePath, with: .color(.red), lineWidth: plottingState.lineWidth)
                     
-                    if showEpochs {
+                    if plottingState.showEpochs {
                         let epochEnd = size.width * (CGFloat(doc.contents.epochLength + event.sampleIndex + 1) / CGFloat(sampleCount))
                         
                         let epochPath = Path { path in
@@ -52,14 +46,14 @@ struct TimelineView: View {
                         }
                         
                         context.fill(epochPath, with: .color(.red.opacity(0.1)))
-                        context.stroke(eventEndPath, with: .color(.red), style: StrokeStyle(lineWidth: lineWidth, dash: [2]))
+                        context.stroke(eventEndPath, with: .color(.red), style: StrokeStyle(lineWidth: plottingState.lineWidth, dash: [2]))
                     }
                 }
                 
-                switch visualisation {
+                switch plottingState.visualisation {
                 case .stackedPlot:
-                    let frameWidth = size.width * (CGFloat(plottingWindowSampleSize) / CGFloat(sampleCount))
-                    let xOffset = size.width * (CGFloat(plottingWindowFirstSampleIndex) / CGFloat(sampleCount))
+                    let frameWidth = size.width * (CGFloat(plottingState.windowSize) / CGFloat(sampleCount))
+                    let xOffset = size.width * (CGFloat(plottingState.windowStartIndex) / CGFloat(sampleCount))
                     let trailingBound = xOffset + frameWidth
                     
                     let windowPath = Path { path in
@@ -71,7 +65,7 @@ struct TimelineView: View {
                     
                     context.fill(windowPath, with: .color(.accentColor.opacity(0.5)))
                 case .scalpMap:
-                    let xOffset = size.width * (CGFloat(scalpMapSampleIndexToDisplay) / CGFloat(sampleCount))
+                    let xOffset = size.width * (CGFloat(plottingState.sampleIndex) / CGFloat(sampleCount))
                     
                     let indicatorPath = Path { path in
                         path.move(to: CGPoint(x: xOffset, y: 0))

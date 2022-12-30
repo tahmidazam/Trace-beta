@@ -12,7 +12,7 @@ class PlottingState: ObservableObject {
     @Published var selectedStreams: [Stream] = []
     @Published var selectedEventTypes: [String] = []
     
-    @Published var visualiation: Visualisation = .stackedPlot
+    @Published var visualisation: Visualisation = .stackedPlot
         
     @Published var windowSize: Int = 50
     @Published var windowStartIndex: Int = 0

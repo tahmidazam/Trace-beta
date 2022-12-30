@@ -9,23 +9,11 @@ import SwiftUI
 
 struct StackedPlotView: View {
     @Binding var doc: TraceDocument
-    @Binding var selectedEventTypes: [String]
-    @Binding var plottingWindowFirstSampleIndex: Int
-    @Binding var plottingWindowSampleSize: Int
-    @Binding var showEpochs: Bool
-    @Binding var visualisation: RootView.Visualisation
-    @Binding var scalpMapSampleIndexToDisplay: Int
-    @Binding var selectedStreams: [Stream]
+    @ObservedObject var plottingState: PlottingState
     
-    var verticalPaddingProportion: CGFloat
     var potentialRange: ClosedRange<Double>
-    
     var timeRange: ClosedRange<Double>
     var sampleRange: ClosedRange<Int>
-    
-    @Binding var mouseLocation: NSPoint?
-    @Binding var lineWidth: CGFloat
-    @Binding var marker: Int?
     
     var body: some View {
         VStack(spacing: 0.0) {
@@ -40,11 +28,11 @@ struct StackedPlotView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .onHover(perform: { isHovering in
                             if !isHovering {
-                                mouseLocation = nil
+                                plottingState.mouseLocation = nil
                             }
                         })
                         .trackMouse { location in
-                            mouseLocation = location
+                            plottingState.mouseLocation = location
                         }
                     
                     plot
@@ -54,7 +42,7 @@ struct StackedPlotView: View {
             Divider()
             
             VStack {
-                TimelineView(doc: $doc, selectedEventTypes: $selectedEventTypes, lineWidth: $lineWidth, showEpochs: $showEpochs, plottingWindowSampleSize: $plottingWindowSampleSize, plottingWindowFirstSampleIndex: $plottingWindowFirstSampleIndex, visualisation: $visualisation, scalpMapSampleIndexToDisplay: $scalpMapSampleIndexToDisplay)
+                TimelineView(doc: $doc, plottingState: plottingState)
                 
                 stackedPlotBottomBar
             }
@@ -64,27 +52,27 @@ struct StackedPlotView: View {
     var plot: some View {
         Canvas { context, size in
             let eventsToDraw = doc.contents.events.filter { event in
-                guard selectedEventTypes.contains(event.type) else {
+                guard plottingState.selectedEventTypes.contains(event.type) else {
                     return false
                 }
                 
                 let epochRange = (event.sampleIndex...(event.sampleIndex + doc.contents.epochLength - 1))
                 
-                return epochRange.contains(plottingWindowFirstSampleIndex) || sampleRange.contains(epochRange.lowerBound) || sampleRange.contains(epochRange.upperBound)
+                return epochRange.contains(plottingState.windowStartIndex) || sampleRange.contains(epochRange.lowerBound) || sampleRange.contains(epochRange.upperBound)
             }
             
             for event in eventsToDraw {
-                let x = size.width * (CGFloat(event.sampleIndex - plottingWindowFirstSampleIndex + 1) / CGFloat(plottingWindowSampleSize))
+                let x = size.width * (CGFloat(event.sampleIndex - plottingState.windowStartIndex + 1) / CGFloat(plottingState.windowSize))
                 
                 let eventPath = Path { path in
                     path.move(to: CGPoint(x: x, y: 0))
                     path.addLine(to: CGPoint(x: x, y: size.height))
                 }
                 
-                context.stroke(eventPath, with: .color(.red), lineWidth: lineWidth)
+                context.stroke(eventPath, with: .color(.red), lineWidth: plottingState.lineWidth)
 
-                if showEpochs {
-                    let epochEnd = size.width * (CGFloat(doc.contents.epochLength + event.sampleIndex - plottingWindowFirstSampleIndex + 1) / CGFloat(plottingWindowSampleSize))
+                if plottingState.showEpochs {
+                    let epochEnd = size.width * (CGFloat(doc.contents.epochLength + event.sampleIndex - plottingState.windowStartIndex + 1) / CGFloat(plottingState.windowSize))
                     
                     let eventEndPath = Path { path in
                         path.move(to: CGPoint(x: epochEnd, y: 0))
@@ -99,22 +87,22 @@ struct StackedPlotView: View {
                     }
                     
                     context.fill(epochPath, with: .color(.red.opacity(0.025)))
-                    context.stroke(eventEndPath, with: .color(.red), style: StrokeStyle(lineWidth: lineWidth, dash: [5]))
+                    context.stroke(eventEndPath, with: .color(.red), style: StrokeStyle(lineWidth: plottingState.lineWidth, dash: [5]))
                 }
             }
             
-            if let marker = marker {
+            if let marker = plottingState.marker {
                 if sampleRange.contains(marker) {
-                    let x = size.width * (CGFloat(marker - plottingWindowFirstSampleIndex + 1) / CGFloat(plottingWindowSampleSize))
+                    let x = size.width * (CGFloat(marker - plottingState.windowStartIndex + 1) / CGFloat(plottingState.windowSize))
                     let markerPath = Path { path in
                         path.move(to: CGPoint(x: x, y: 0))
                         path.addLine(to: CGPoint(x: x, y: size.height))
                     }
-                    context.stroke(markerPath, with: .color(.green), lineWidth: lineWidth)
+                    context.stroke(markerPath, with: .color(.green), lineWidth: plottingState.lineWidth)
                 }
             }
             
-            if let mouseLocation = mouseLocation {
+            if let mouseLocation = plottingState.mouseLocation {
                 let markerPathX = Path { path in
                     path.move(to: CGPoint(x: mouseLocation.x, y: 0))
                     path.addLine(to: CGPoint(x: mouseLocation.x, y: size.height))
@@ -123,14 +111,14 @@ struct StackedPlotView: View {
                     path.move(to: CGPoint(x: 0, y: mouseLocation.y))
                     path.addLine(to: CGPoint(x: size.width, y: mouseLocation.y))
                 }
-                context.stroke(markerPathX, with: .color(.green.opacity(0.25)), lineWidth: lineWidth)
-                context.stroke(markerPathY, with: .color(.green.opacity(0.25)), lineWidth: lineWidth)
+                context.stroke(markerPathX, with: .color(.green.opacity(0.25)), lineWidth: plottingState.lineWidth)
+                context.stroke(markerPathY, with: .color(.green.opacity(0.25)), lineWidth: plottingState.lineWidth)
             }
             
-            for (streamIndex, stream) in selectedStreams.enumerated() {
-                let path = stream.path(plotSize: size, verticalPaddingProportion: verticalPaddingProportion, rowCount: selectedStreams.count, rowIndex: streamIndex, globalPotentialRange: potentialRange, firstSampleIndex: plottingWindowFirstSampleIndex, plottingWindowSize: plottingWindowSampleSize)
+            for (streamIndex, stream) in plottingState.selectedStreams.enumerated() {
+                let path = stream.path(plotSize: size, verticalPaddingProportion: PlottingState.verticalPaddingProportion, rowCount: plottingState.selectedStreams.count, rowIndex: streamIndex, globalPotentialRange: potentialRange, firstSampleIndex: plottingState.windowStartIndex, plottingWindowSize: plottingState.windowSize)
                 
-                context.stroke(path, with: .color(.accentColor), lineWidth: lineWidth)
+                context.stroke(path, with: .color(.accentColor), lineWidth: plottingState.lineWidth)
             }
         }
     }
@@ -143,7 +131,7 @@ struct StackedPlotView: View {
     var streamSidebar: some View {
         GeometryReader { proxy in
             VStack(spacing: 0.0) {
-                ForEach(selectedStreams) { stream in
+                ForEach(plottingState.selectedStreams) { stream in
                     HStack {
                         Text(stream.electrode.symbol)
                             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -153,7 +141,7 @@ struct StackedPlotView: View {
                     .frame(maxHeight: .infinity)
                 }
             }
-            .frame(height: proxy.size.height * (1 - verticalPaddingProportion))
+            .frame(height: proxy.size.height * (1 - PlottingState.verticalPaddingProportion))
             .frame(maxHeight: .infinity, alignment: .center)
         }
     }
@@ -169,12 +157,12 @@ struct StackedPlotView: View {
                         .font(.headline)
                         .foregroundColor(.secondary)
                     
-                    Text("\(plottingWindowFirstSampleIndex + 1)")
+                    Text("\(plottingState.windowStartIndex + 1)")
                         .font(.system(.title2, design: .monospaced))
                 }
                 
                 HStack(alignment: .firstTextBaseline, spacing: 0.0) {
-                    Text("\(doc.contents.time(at: plottingWindowFirstSampleIndex).format())")
+                    Text("\(doc.contents.time(at: plottingState.windowStartIndex).format())")
                         .font(.system(.body, design: .monospaced))
                     
                     Text(" s")
@@ -196,12 +184,12 @@ struct StackedPlotView: View {
                         .font(.headline)
                         .foregroundColor(.secondary)
                     
-                    Text("\(plottingWindowFirstSampleIndex + plottingWindowSampleSize)")
+                    Text("\(plottingState.windowStartIndex + plottingState.windowSize)")
                         .font(.system(.title2, design: .monospaced))
                 }
                 
                 HStack(alignment: .firstTextBaseline, spacing: 0.0) {
-                    Text("\(doc.contents.time(at: plottingWindowFirstSampleIndex + plottingWindowSampleSize).format())")
+                    Text("\(doc.contents.time(at: plottingState.windowStartIndex + plottingState.windowSize).format())")
                         .font(.system(.body, design: .monospaced))
                     
                     Text(" s")
@@ -213,34 +201,34 @@ struct StackedPlotView: View {
             
             nextWindow
         }
-        .disabled(visualisation != .stackedPlot)
+        .disabled(plottingState.visualisation != PlottingState.Visualisation.stackedPlot)
     }
     
     var previousWindow: some View {
         Button(action: {
-            plottingWindowFirstSampleIndex -= plottingWindowSampleSize
+            plottingState.windowStartIndex -= plottingState.windowSize
         }) {
             Image(systemName: "arrowtriangle.left.square")
         }
-        .disabled((plottingWindowFirstSampleIndex - plottingWindowSampleSize) < 0)
+        .disabled((plottingState.windowStartIndex - plottingState.windowSize) < 0)
         .keyboardShortcut(.leftArrow)
         .buttonStyle(.borderless)
         .controlSize(.large)
     }
     var shiftWindowLeft: some View {
         Button(action: {
-            plottingWindowFirstSampleIndex -= 1
+            plottingState.windowStartIndex -= 1
         }) {
             Image(systemName: "backward.frame.fill")
         }
-        .disabled(plottingWindowFirstSampleIndex - 1 < 0)
+        .disabled(plottingState.windowStartIndex - 1 < 0)
         .keyboardShortcut(.leftArrow, modifiers: [])
         .buttonStyle(.borderless)
         .controlSize(.large)
     }
     var shiftWindowRight: some View {
         Button(action: {
-            plottingWindowFirstSampleIndex += 1
+            plottingState.windowStartIndex += 1
         }) {
             Image(systemName: "forward.frame.fill")
         }
@@ -251,11 +239,11 @@ struct StackedPlotView: View {
     }
     var nextWindow: some View {
         Button(action: {
-            plottingWindowFirstSampleIndex += plottingWindowSampleSize
+            plottingState.windowStartIndex += plottingState.windowSize
         }) {
             Image(systemName: "arrowtriangle.right.square")
         }
-        .disabled((plottingWindowFirstSampleIndex + 2 * plottingWindowSampleSize) > doc.contents.sampleCount ?? 0)
+        .disabled((plottingState.windowStartIndex + 2 * plottingState.windowSize) > doc.contents.sampleCount ?? 0)
         .keyboardShortcut(.rightArrow)
         .buttonStyle(.borderless)
         .controlSize(.large)

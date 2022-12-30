@@ -9,12 +9,12 @@ import SwiftUI
 
 struct EventsDetailView: View {
     @Binding var doc: TraceDocument
-    @Binding var selectedEventTypes: [String]
-    @Binding var showEpochs: Bool
+    @ObservedObject var plottingState: PlottingState
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0.0) {
-                Toggle(isOn: $showEpochs) {
+                Toggle(isOn: $plottingState.showEpochs) {
                     Text("Show epochs")
                     Text("Color the epoch window along with event stamps")
                 }
@@ -50,15 +50,15 @@ struct EventsDetailView: View {
                         ForEach(doc.contents.eventTypes, id: \.self) { eventType in
                             HStack {
                                 Button {
-                                    if selectedEventTypes.contains(eventType) {
-                                        selectedEventTypes.removeAll { eventType_ in
+                                    if plottingState.selectedEventTypes.contains(eventType) {
+                                        plottingState.selectedEventTypes.removeAll { eventType_ in
                                             eventType_ == eventType
                                         }
                                     } else {
-                                        selectedEventTypes.append(eventType)
+                                        plottingState.selectedEventTypes.append(eventType)
                                     }
                                 } label: {
-                                    if selectedEventTypes.contains(eventType) {
+                                    if plottingState.selectedEventTypes.contains(eventType) {
                                         Image(systemName: "circle.inset.filled")
                                             .foregroundColor(.accentColor)
                                     } else {
@@ -82,11 +82,11 @@ struct EventsDetailView: View {
                     
                     HStack {
                         Button("Deselect all") {
-                            selectedEventTypes = []
+                            plottingState.selectedEventTypes = []
                         }
                         
                         Button("Select all") {
-                            selectedEventTypes = doc.contents.eventTypes
+                            plottingState.selectedEventTypes = doc.contents.eventTypes
                         }
                         
                         Spacer()
