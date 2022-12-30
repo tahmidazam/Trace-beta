@@ -22,6 +22,8 @@
 		C67DE07F289F99F2004A5D75 /* Electrode.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE07E289F99F2004A5D75 /* Electrode.swift */; };
 		C67DE081289F9EB9004A5D75 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67DE080289F9EB9004A5D75 /* Extensions.swift */; };
 		C67DE084289F9F63004A5D75 /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = C67DE083289F9F62004A5D75 /* Documentation.docc */; };
+		C6814234295F4B0B005EA88D /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6814233295F4B0B005EA88D /* TimelineView.swift */; };
+		C6814236295F4D07005EA88D /* PlottingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6814235295F4D07005EA88D /* PlottingState.swift */; };
 		C69999092950F67800B00C36 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69999082950F67800B00C36 /* Renderer.swift */; };
 		C69DB9CC29454355006C52FA /* EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69DB9CB29454355006C52FA /* EventsView.swift */; };
 		C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8928944CA000473F34 /* DocumentView.swift */; };
@@ -76,6 +78,8 @@
 		C67DE07E289F99F2004A5D75 /* Electrode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Electrode.swift; sourceTree = "<group>"; };
 		C67DE080289F9EB9004A5D75 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C67DE083289F9F62004A5D75 /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
+		C6814233295F4B0B005EA88D /* TimelineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		C6814235295F4D07005EA88D /* PlottingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottingState.swift; sourceTree = "<group>"; };
 		C69999082950F67800B00C36 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		C69DB9CB29454355006C52FA /* EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsView.swift; sourceTree = "<group>"; };
 		C6B8BA8928944CA000473F34 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
@@ -137,6 +141,7 @@
 				C63DACCF2959F9160013EBCF /* PlotDetailView.swift */,
 				C63DACD12959F91C0013EBCF /* EventsDetailView.swift */,
 				C63DACD32959FA590013EBCF /* StackedPlotView.swift */,
+				C6814233295F4B0B005EA88D /* TimelineView.swift */,
 				C63DACD52959FB6A0013EBCF /* ScalpMapVisualisationView.swift */,
 			);
 			path = Root;
@@ -152,6 +157,7 @@
 				C67DE07E289F99F2004A5D75 /* Electrode.swift */,
 				C608E9DE294E35D2009ADDB4 /* Event.swift */,
 				C67DE080289F9EB9004A5D75 /* Extensions.swift */,
+				C6814235295F4D07005EA88D /* PlottingState.swift */,
 			);
 			path = Structures;
 			sourceTree = "<group>";
@@ -378,6 +384,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */,
+				C6814236295F4D07005EA88D /* PlottingState.swift in Sources */,
 				C63DACCE2959F90F0013EBCF /* StreamsDetailView.swift in Sources */,
 				C6DC5BA52874B795007B679C /* TraceDocument.swift in Sources */,
 				C67DE079289F9599004A5D75 /* TraceDocumentContents.swift in Sources */,
@@ -390,6 +397,7 @@
 				C69DB9CC29454355006C52FA /* EventsView.swift in Sources */,
 				C6CABC93294FC5D50066D81D /* NewEventTypeView.swift in Sources */,
 				C6DC5BD92874C9DE007B679C /* ImportFromTextView.swift in Sources */,
+				C6814234295F4B0B005EA88D /* TimelineView.swift in Sources */,
 				C67DE07B289F95C2004A5D75 /* CompressedTraceDocumentContents.swift in Sources */,
 				C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */,
 				C67DE07D289F95D7004A5D75 /* Stream.swift in Sources */,

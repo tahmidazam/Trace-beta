@@ -54,7 +54,7 @@ struct StackedPlotView: View {
             Divider()
             
             VStack {
-                timeline
+                TimelineView(doc: $doc, selectedEventTypes: $selectedEventTypes, lineWidth: $lineWidth, showEpochs: $showEpochs, plottingWindowSampleSize: $plottingWindowSampleSize, plottingWindowFirstSampleIndex: $plottingWindowFirstSampleIndex, visualisation: $visualisation, scalpMapSampleIndexToDisplay: $scalpMapSampleIndexToDisplay)
                 
                 stackedPlotBottomBar
             }
@@ -156,62 +156,6 @@ struct StackedPlotView: View {
             .frame(height: proxy.size.height * (1 - verticalPaddingProportion))
             .frame(maxHeight: .infinity, alignment: .center)
         }
-    }
-    var timeline: some View {
-        Canvas { context, size in
-            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(.quaternaryLabelColor)))
-            
-            if let sampleCount = doc.contents.sampleCount {
-                for event in doc.contents.events.filter({ event in
-                    selectedEventTypes.contains(event.type)
-                }) {
-                    let timeProportion = CGFloat(event.sampleIndex + 1) / CGFloat(sampleCount)
-                    
-                    let x = size.width * timeProportion
-                    
-                    let linePath: Path = Path { path in
-                        path.move(to: CGPoint(x: x, y: 0))
-                        path.addLine(to: CGPoint(x: x, y: size.height))
-                    }
-                    
-                    context.stroke(linePath, with: .color(.red), lineWidth: lineWidth)
-                    
-                    if showEpochs {
-                        let epochEnd = size.width * (CGFloat(doc.contents.epochLength + event.sampleIndex + 1) / CGFloat(sampleCount))
-                        
-                        let epochPath = Path { path in
-                            path.move(to: CGPoint(x: x, y: 0))
-                            path.addLine(to: CGPoint(x: epochEnd, y: 0))
-                            path.addLine(to: CGPoint(x: epochEnd, y: size.height))
-                            path.addLine(to: CGPoint(x: x, y: size.height))
-                        }
-                        
-                        let eventEndPath = Path { path in
-                            path.move(to: CGPoint(x: epochEnd, y: 0))
-                            path.addLine(to: CGPoint(x: epochEnd, y: size.height))
-                        }
-                        
-                        context.fill(epochPath, with: .color(.red.opacity(0.1)))
-                        context.stroke(eventEndPath, with: .color(.red), style: StrokeStyle(lineWidth: lineWidth, dash: [2]))
-                    }
-                }
-                
-                let frameWidth = size.width * (CGFloat(plottingWindowSampleSize) / CGFloat(sampleCount))
-                let xOffset = size.width * (CGFloat(plottingWindowFirstSampleIndex) / CGFloat(sampleCount))
-                let trailingBound = xOffset + frameWidth
-                
-                let windowPath = Path { path in
-                    path.move(to: CGPoint(x: xOffset, y: 0))
-                    path.addLine(to: CGPoint(x: xOffset, y: size.height))
-                    path.addLine(to: CGPoint(x: trailingBound, y: size.height))
-                    path.addLine(to: CGPoint(x: trailingBound, y: 0))
-                }
-                
-                context.fill(windowPath, with: .color(.accentColor.opacity(0.5)))
-            }
-        }
-        .mask(Capsule())
-        .frame(height: 10)
     }
     var stackedPlotBottomBar: some View {
         HStack {

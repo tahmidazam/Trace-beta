@@ -42,8 +42,6 @@ struct RootView: View {
     private let rightSidebarWidth: CGFloat = 300
     private let verticalPaddingProportion: CGFloat = 0.1
     
-    
-    
     // MARK: ENUMERATIONS
     
     enum Visualisation {
@@ -105,7 +103,11 @@ struct RootView: View {
                         showElectrodeLabels: $showElectrodeLabels,
                         showElectrodePotentials: $showElectrodePotentials,
                         showEpochs: $showEpochs,
-                        selectedEventTypes: $selectedEventTypes
+                        selectedEventTypes: $selectedEventTypes,
+                        lineWidth: $lineWidth,
+                        plottingWindowSampleSize: $plottingWindowSampleSize,
+                        plottingWindowFirstSampleIndex: $plottingWindowFirstSampleIndex,
+                        visualisation: $visualisation
                     )
                 }
             }
