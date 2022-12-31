@@ -18,7 +18,6 @@ import SwiftUI
 struct TraceApp: App {
     var body: some Scene {
         DocumentGroup(newDocument: TraceDocument()) { file in
-            #if os(macOS)
             RootView(doc: file.$document)
                 .task {
                     file.document.contents.streams.sort { lhs, rhs in
@@ -29,19 +28,21 @@ struct TraceApp: App {
                         return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
                     }
                 }
-            #else
-            DocumentView(doc: file.$document)
-                .task {
-                    file.document.contents.streams.sort { lhs, rhs in
-                        if lhs.electrode.prefix == rhs.electrode.prefix {
-                            return lhs.electrode.suffix < rhs.electrode.suffix
-                        }
-
-                        return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
-                    }
-                }
-                .toolbar(.hidden)
-            #endif
+//            #if os(macOS)
+//
+//            #else
+//            DocumentView(doc: file.$document)
+//                .task {
+//                    file.document.contents.streams.sort { lhs, rhs in
+//                        if lhs.electrode.prefix == rhs.electrode.prefix {
+//                            return lhs.electrode.suffix < rhs.electrode.suffix
+//                        }
+//
+//                        return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
+//                    }
+//                }
+//                .toolbar(.hidden)
+//            #endif
         }
     }
 }

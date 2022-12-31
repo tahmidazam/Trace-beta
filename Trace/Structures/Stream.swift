@@ -77,7 +77,7 @@ struct Stream: Identifiable, Codable, Hashable {
             return Color(nsColor: negativeColors.intermediate(percentage: prop))
         }
     }
-    
+#endif
     func path(
         plotSize: CGSize,
         verticalPaddingProportion: Double,
@@ -85,10 +85,12 @@ struct Stream: Identifiable, Codable, Hashable {
         rowIndex: Int,
         globalPotentialRange: ClosedRange<Double>,
         firstSampleIndex: Int,
-        plottingWindowSize: Int
+        plottingWindowSize: Int,
+        pointsPerCGPoint: Int
     ) -> Path {
-        let maxAbsolutePotential = max(abs(globalPotentialRange.lowerBound), abs(globalPotentialRange.upperBound))
         
+        let maxAbsolutePotential = max(abs(globalPotentialRange.lowerBound), abs(globalPotentialRange.upperBound))
+    
         let rowHeight: CGFloat = (plotSize.height * (1 - verticalPaddingProportion)) / Double(rowCount)
         
         let minY = (plotSize.height * verticalPaddingProportion / 2) + rowHeight * CGFloat(rowIndex)
@@ -96,9 +98,13 @@ struct Stream: Identifiable, Codable, Hashable {
         
         let xStep = plotSize.width / CGFloat(plottingWindowSize - 1)
         
+        print(xStep)
+        
         let sampleIndexRange = (firstSampleIndex...(firstSampleIndex + plottingWindowSize - 1))
         
-        let points: [CGPoint] = sampleIndexRange.enumerated().map { index, sampleIndex in
+        let points: [CGPoint] = sampleIndexRange.enumerated().compactMap { index, sampleIndex in
+            guard index.quotientAndRemainder(dividingBy: pointsPerCGPoint).remainder == 0 else { return nil }
+            
             let potential = samples[sampleIndex]
             
             let x = xStep * CGFloat(index)
@@ -122,7 +128,6 @@ struct Stream: Identifiable, Codable, Hashable {
         
         return path
     }
-#endif
     
     // MARK: STATIC FUNCTIONS
     /// Import samples of potentials from a text input.

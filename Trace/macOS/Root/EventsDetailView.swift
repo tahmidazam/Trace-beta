@@ -11,6 +11,7 @@ struct EventsDetailView: View {
     @Binding var doc: TraceDocument
     @ObservedObject var plottingState: PlottingState
 
+    #if os(macOS)
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0.0) {
@@ -32,7 +33,20 @@ struct EventsDetailView: View {
                     Text("The number of samples that make up an epoch")
                 }
                 .padding(.vertical)
-
+                
+                Divider()
+                
+                VStack {
+                    Text("Epoch fill opacity")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Slider(value: $plottingState.epochFillOpacity, in: 0...0.5, label: {}, minimumValueLabel: {
+                        Text("0%")
+                    }, maximumValueLabel: {
+                        Text("50%")
+                    })
+                }
+                .padding(.vertical)
                 
                 Divider()
                 
@@ -100,4 +114,66 @@ struct EventsDetailView: View {
             .padding()
         }
     }
+    #else
+    var body: some View {
+        List {
+            Section("epochs".capitalized) {
+                Toggle(isOn: $plottingState.showEpochs) {
+                    Text("Show epochs")
+                    Text("Color the epoch window along with event stamps")
+                }
+                
+                Stepper(value: $doc.contents.epochLength, in: 10...500, step: 10) {
+                    Text("Epoch length: \(doc.contents.epochLength)")
+                    Text("The number of samples that make up an epoch")
+                }
+            }
+            
+            Section("Event types".capitalized) {
+                ForEach(doc.contents.eventTypes, id: \.self) { eventType in
+                    HStack {
+                        Button {
+                            if plottingState.selectedEventTypes.contains(eventType) {
+                                plottingState.selectedEventTypes.removeAll { eventType_ in
+                                    eventType_ == eventType
+                                }
+                            } else {
+                                plottingState.selectedEventTypes.append(eventType)
+                            }
+                        } label: {
+                            if plottingState.selectedEventTypes.contains(eventType) {
+                                Image(systemName: "circle.inset.filled")
+                                    .foregroundColor(.accentColor)
+                            } else {
+                                Image(systemName: "circle")
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .buttonStyle(.borderless)
+                        .padding(.trailing)
+                        
+                        LabeledContent {
+                            Text("\(doc.contents.events.filter({ event in event.type == eventType }).count)")
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        } label: {
+                            Text(eventType)
+                        }
+                    }
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button("Deselect all") {
+                    plottingState.selectedEventTypes = []
+                }
+                
+                Button("Select all") {
+                    plottingState.selectedEventTypes = doc.contents.eventTypes
+                }
+            }
+        }
+    }
+    #endif
 }

@@ -8,7 +8,6 @@
 import SwiftUI
 import Charts
 
-#if os(macOS)
 struct RootView: View {
     @Binding var doc: TraceDocument
     @State var detail: Detail = .plot
@@ -25,6 +24,10 @@ struct RootView: View {
         var id: Self { self }
         
         case events, study
+        
+#if os(iOS)
+        case detail
+#endif
     }
     
     var potentialRange: ClosedRange<Double> {
@@ -37,14 +40,81 @@ struct RootView: View {
         return (plottingState.windowStartIndex...(plottingState.windowStartIndex + plottingState.windowSize - 1))
     }
     
+    
     var body: some View {
         if doc.contents.streams.isEmpty {
             OnboardingView(doc: $doc)
         } else {
             document
+                .task {
+                    plottingState.selectedStreams = doc.contents.streams
+                    plottingState.selectedEventTypes = doc.contents.eventTypes
+                }
+                .onChange(of: plottingState.selectedStreams) { newValue in
+                    plottingState.selectedStreams = newValue.sorted(by: { lhs, rhs in
+                        if lhs.electrode.prefix == rhs.electrode.prefix {
+                            return lhs.electrode.suffix < rhs.electrode.suffix
+                        }
+                        
+                        return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
+                    })
+                }
+                .sheet(item: $sheetPresented) { sheet in
+                    switch sheet {
+                    case .events:
+                        EventsView(doc: $doc)
+                            .frame(minWidth: 500, minHeight: 400)
+                    case .study: StudyView(doc: $doc)
+                            .frame(minWidth: 500, minHeight: 400)
+#if os(iOS)
+                    case .detail:
+                        NavigationStack {
+                            VStack(spacing: 0.0) {
+                                HStack {
+                                    Picker("", selection: $detail) {
+                                        ForEach(Detail.allCases, id: \.self) { detail in
+                                            Text(detail.rawValue.capitalized).tag(detail)
+                                        }
+                                    }
+                                    .labelsHidden()
+                                    .pickerStyle(.segmented)
+                                    .padding(.vertical, 8)
+                                    .padding(.trailing)
+                                    
+                                    Button {
+                                        sheetPresented = nil
+                                    } label: {
+                                        Label("Close", systemImage: "xmark.circle.fill")
+                                            .labelStyle(.iconOnly)
+                                            .font(.title)
+                                    }
+                                    .symbolRenderingMode(.hierarchical)
+                                }
+                                .padding(.horizontal)
+                                
+                                Divider()
+                                
+                                switch detail {
+                                case .plot:
+                                    PlotDetailView(
+                                        doc: $doc, plottingState: plottingState)
+                                case .streams:
+                                    StreamsDetailView(
+                                        doc: $doc, plottingState: plottingState)
+                                case .events:
+                                    EventsDetailView(
+                                        doc: $doc, plottingState: plottingState)
+                                }
+                            }
+                        }
+                        .presentationDetents([.medium, .large])
+                        .presentationDragIndicator(.hidden)
+#endif
+                    }
+                }
         }
     }
-    
+#if os(macOS)
     var document: some View {
         HStack(spacing: 0.0) {
             Group {
@@ -108,32 +178,37 @@ struct RootView: View {
                 }
             }
         }
-        .task {
-            plottingState.selectedStreams = doc.contents.streams
-            plottingState.selectedEventTypes = doc.contents.eventTypes
-        }
-        .onChange(of: plottingState.selectedStreams) { newValue in
-            plottingState.selectedStreams = newValue.sorted(by: { lhs, rhs in
-                if lhs.electrode.prefix == rhs.electrode.prefix {
-                    return lhs.electrode.suffix < rhs.electrode.suffix
+    }
+#elseif os(iOS)
+    var document: some View {
+        Group {
+            HStack(spacing: 0.0) {
+                Divider()
+                
+                switch plottingState.visualisation {
+                case .stackedPlot:
+                    StackedPlotView(doc: $doc, plottingState: plottingState, potentialRange: potentialRange, timeRange: timeRange, sampleRange: sampleRange)
+                case .scalpMap:
+                    ScalpMapVisualisationView(doc: $doc, plottingState: plottingState)
                 }
                 
-                return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
-            })
+                Divider()
+            }
         }
-        .sheet(item: $sheetPresented) { sheet in
-            switch sheet {
-            case .events:
-                EventsView(doc: $doc)
-                    .frame(minWidth: 500, minHeight: 400)
-            case .study: StudyView(doc: $doc)
-                    .frame(minWidth: 500, minHeight: 400)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup {
+                Button {
+                    sheetPresented = .detail
+                } label: {
+                    Label("Format", systemImage: "paintbrush")
+                }
             }
         }
     }
-    
-    func rowHeight(size: CGSize) -> CGFloat {
-        return Double(size.height * (1 - PlottingState.verticalPaddingProportion)) / Double(plottingState.selectedStreams.count)
+#else
+    var document: some View {
+        EmptyView()
     }
-}
 #endif
+}

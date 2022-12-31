@@ -14,15 +14,18 @@ class PlottingState: ObservableObject {
     
     @Published var visualisation: Visualisation = .stackedPlot
         
-    @Published var windowSize: Int = 50
+    @Published var windowSize: Int = 1000
     @Published var windowStartIndex: Int = 0
+    @Published var stepSize: Int = 1
+    @Published var pointsPerCGPoint: Int = 1
     @Published var sampleIndex: Int = 0
     @State var marker: Int? = nil
     
     @Published var showEpochs: Bool = true
+    @Published var epochFillOpacity: CGFloat = 0.025
     @Published var showElectrodeLabels: Bool = true
     @Published var showElectrodePotentials: Bool = true
-    @State var lineWidth: CGFloat = 1.0
+    @Published var lineWidth: CGFloat = 1.0
 
     #if os(macOS)
     @State var mouseLocation: NSPoint? = nil
@@ -31,7 +34,7 @@ class PlottingState: ObservableObject {
     static let minWindowWidth: CGFloat = 600
     static let minWindowHeight: CGFloat = 400
     static let rightSidebarWidth: CGFloat = 300
-    static let verticalPaddingProportion: CGFloat = 0.1
+    static let verticalPaddingProportion: CGFloat = 0.0
     
     // MARK: ENUMERATIONS
     enum Visualisation { case stackedPlot, scalpMap }

@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-#if os(macOS)
 struct EventsView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var doc: TraceDocument
@@ -51,6 +50,7 @@ struct EventsView: View {
     @State private var sortOrder = [KeyPathComparator(\Event.sampleIndex)]
     @State var presentedSheet: EventsViewSheet? = nil
     
+    #if os(macOS)
     var body: some View {
         NavigationSplitView {
             List(selection: $tab) {
@@ -121,6 +121,11 @@ struct EventsView: View {
         }
         .alert(item: $alert, content: { alert in alert.alert })
     }
+    #else
+    var body: some View {
+        EmptyView()
+    }
+    #endif
     var disableNewEventButton: Bool {
         return doc.contents.eventTypes.count == 0
     }
@@ -152,4 +157,3 @@ struct EventsView: View {
         })))
     }
 }
-#endif

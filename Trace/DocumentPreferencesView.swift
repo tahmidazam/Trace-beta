@@ -28,14 +28,14 @@ struct DocumentPreferencesView: View {
                         
                         Spacer()
                         
-                        Text(doc.contents.subject ?? "No data")
+                        Text(doc.contents.subject)
                             .foregroundColor(.secondary)
                     }
                     
                     VStack(alignment: .leading) {
                         Text("Info")
                         
-                        Text(doc.contents.subject ?? "No data")
+                        Text(doc.contents.subject)
                             .foregroundColor(.secondary)
                     }
                 }

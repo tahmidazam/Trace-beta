@@ -34,13 +34,15 @@ struct OnboardingView: View {
                 .font(.title3.bold())
                 .multilineTextAlignment(.leading)
             
-            Text("Import multi-stream data from \(Image(systemName: "rectangle.split.3x3")) CSV, or stream-by-stream from pasted \(Image(systemName: "text.alignleft")) text.")
+            Text("Import multi-stream data from \(Image(systemName: "rectangle.split.3x3")) CSV")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.subheadline)
                 .multilineTextAlignment(.leading)
                 .padding(.vertical)
             
-            Text("In CSV files, each column represents a stream, with the first cell corresponding to the electrode label, and the rest of the cells form the array of samples. Each column (i.e., each stream) must have the same number of samples, and the electrode label must satisfy the format specified above.\n\nPasted text must be newline-separated values, and electrode information is inputted separately.\n\nInformation about import file requirements, electrode support and general support can be found on the [GitHub page](https://github.com/tahmidazam/Trace).")
+            Spacer()
+            
+            Text("In CSV files, each column represents a stream, with the first cell corresponding to the electrode label, and the rest of the cells form the array of samples. Each column (i.e., each stream) must have the same number of samples, and the electrode label must satisfy the format specified above.\n\nInformation about import file requirements, electrode support and general support can be found on the [GitHub page](https://github.com/tahmidazam/Trace).")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.leading)

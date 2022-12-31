@@ -13,7 +13,11 @@ struct TimelineView: View {
 
     var body: some View {
         Canvas { context, size in
+            #if os(macOS)
             context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(.quaternaryLabelColor)))
+            #else
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(.quaternaryLabel)))
+            #endif
             
             if let sampleCount = doc.contents.sampleCount {
                 for event in doc.contents.events.filter({ event in
