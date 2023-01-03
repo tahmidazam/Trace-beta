@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct StackedPlotView: View {
     @Binding var doc: TraceDocument
@@ -14,6 +15,8 @@ struct StackedPlotView: View {
     var potentialRange: ClosedRange<Double>
     var timeRange: ClosedRange<Double>
     var sampleRange: ClosedRange<Int>
+    
+    @State var offset = CGSize.zero
     
     #if os(macOS)
     var body: some View {
@@ -25,18 +28,7 @@ struct StackedPlotView: View {
                 Divider()
                 
                 plot
-                    .overlay(content: {
-                        Color.clear
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .onHover(perform: { isHovering in
-                                if !isHovering {
-                                    plottingState.mouseLocation = nil
-                                }
-                            })
-                            .trackMouse { location in
-                                plottingState.mouseLocation = location
-                            }
-                    })
+                    
             }
             
             Divider()
@@ -60,7 +52,9 @@ struct StackedPlotView: View {
                 
                 Divider()
                 
-                plot
+                ZStack {
+                    plot
+                }
             }
             
             Divider()
@@ -158,14 +152,42 @@ struct StackedPlotView: View {
                     context.stroke(markerPathY, with: .color(.green.opacity(0.25)), lineWidth: plottingState.lineWidth)
                 }
                 #endif
-                
-                for (streamIndex, stream) in plottingState.selectedStreams.enumerated() {
-                    let path = stream.path(plotSize: size, verticalPaddingProportion: PlottingState.verticalPaddingProportion, rowCount: plottingState.selectedStreams.count, rowIndex: streamIndex, globalPotentialRange: potentialRange, firstSampleIndex: plottingState.windowStartIndex, plottingWindowSize: plottingState.windowSize, pointsPerCGPoint: plottingState.pointsPerCGPoint)
-                    
-                    context.stroke(path, with: .color(.accentColor), lineWidth: plottingState.lineWidth)
+            }
+            
+            if plottingState.colorLinePlot {
+                ZStack {
+                    GeometryReader { proxy in
+                        VStack(spacing: 0.0) {
+                            let rowHeight: CGFloat = (proxy.size.height * (1 - PlottingState.verticalPaddingProportion)) / Double(plottingState.selectedStreams.count)
+                            
+                            ForEach(plottingState.selectedStreams.indices, id: \.self) { _ in
+                                LinearGradient(colors: [.red, .yellow, .green, .green, .cyan, .blue], startPoint: .top, endPoint: .bottom)
+                                    .frame(height: rowHeight)
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                    }
+                    .mask {
+                        Canvas { context, size in
+                            for (streamIndex, stream) in plottingState.selectedStreams.enumerated() {
+                                let path = stream.path(plotSize: size, verticalPaddingProportion: PlottingState.verticalPaddingProportion, rowCount: plottingState.selectedStreams.count, rowIndex: streamIndex, globalPotentialRange: plottingState.visiblePotentialRange, firstSampleIndex: plottingState.windowStartIndex, plottingWindowSize: plottingState.windowSize, pointsPerCGPoint: plottingState.pointsPerCGPoint)
+                                
+                                context.stroke(path, with: .color(.black), lineWidth: plottingState.lineWidth)
+                            }
+                        }
+                    }
+                }
+            } else {
+                Canvas { context, size in
+                    for (streamIndex, stream) in plottingState.selectedStreams.enumerated() {
+                        let path = stream.path(plotSize: size, verticalPaddingProportion: PlottingState.verticalPaddingProportion, rowCount: plottingState.selectedStreams.count, rowIndex: streamIndex, globalPotentialRange: plottingState.visiblePotentialRange, firstSampleIndex: plottingState.windowStartIndex, plottingWindowSize: plottingState.windowSize, pointsPerCGPoint: plottingState.pointsPerCGPoint)
+                        
+                        context.stroke(path, with: .color(.accentColor), lineWidth: plottingState.lineWidth)
+                    }
                 }
             }
         }
+        .background(Color("PlotBackground"))
     }
     var electrodeTick: some View {
         VStack {

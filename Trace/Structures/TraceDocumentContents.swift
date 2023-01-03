@@ -88,6 +88,27 @@ struct TraceDocumentContents: Identifiable, Codable {
         return Double(index) * (1 / sampleRate)
     }
     
+    func ERP(of eventTypes: [String], for streamIndex: Int) -> [Double] {
+        let eventsToInclude = events.filter { event in
+            eventTypes.contains(event.type)
+        }
+        
+        let epochs = eventsToInclude.map { event in
+            let stream = streams[streamIndex]
+            let sampleIndex = event.sampleIndex
+            
+            return stream.samples[sampleIndex..<(sampleIndex + epochLength)]
+        }
+        
+        let summedPotentials = (0..<epochLength).map { epochIndex in
+            return epochs.map { epoch in
+                return epoch[epochIndex]
+            }.reduce(0, +)
+        }
+        
+        return summedPotentials
+    }
+    
 //    func eventRelatedPotentials(epochWindow: ClosedRange<Int>, eventKey: String? = nil) -> [Double]? {
 //        guard let events, let sampleCount else {
 //            return nil
@@ -143,7 +164,6 @@ struct TraceDocumentContents: Identifiable, Codable {
     /// - Parameter csv: The raw text from the csv file.
     /// - Returns: Stream instances from the csv file.
     static func streams(from csv: String) -> [Stream]? {
-        var streams: [Stream] = []
         
         var lines = csv.components(separatedBy: .newlines).filter { $0 != "" }
         
@@ -153,27 +173,47 @@ struct TraceDocumentContents: Identifiable, Codable {
             string.trimmingCharacters(in: .whitespacesAndNewlines )
         }
         
-        for symbolIndex in electrodeSymbols.indices {
-            guard let electrode = Electrode(from: electrodeSymbols[symbolIndex]) else { return nil }
+        return electrodeSymbols.enumerated().compactMap { symbolIndex, symbol in
+            guard let electrode = Electrode(from: symbol) else { return nil }
             
-            var streamDataPoints: [Double] = []
-            
-            for line in lines {
-                let lineDataPoints = line.components(separatedBy: ",")
+            let samples = lines.compactMap { line in
+                let dataPoint = (line.components(separatedBy: ","))[symbolIndex].filter { $0.isNumber || $0 == "." || $0 == "-"}
                 
-                let dataPoint = lineDataPoints[symbolIndex].filter { $0.isNumber || $0 == "." || $0 == "-"}
-                
-                guard let dataPoint = Double(dataPoint) else { return nil }
-                
-                streamDataPoints.append(dataPoint)
+                return Double(dataPoint)
             }
             
-            let stream = Stream(electrode: electrode, samples: streamDataPoints)
+            guard samples.count == lines.count else { return nil }
             
-            streams.append(stream)
+            return Stream(electrode: electrode, samples: samples)
         }
         
-        return streams
+//        for symbolIndex in electrodeSymbols.indices {
+//            guard let electrode = Electrode(from: electrodeSymbols[symbolIndex]) else { return nil }
+//
+//            var samples = lines.map { line in
+//                let dataPoint = (line.components(separatedBy: ","))[symbolIndex].filter { $0.isNumber || $0 == "." || $0 == "-"}
+//
+//                return Double(dataPoint)
+//            }
+//
+////            var streamDataPoints: [Double] = []
+////
+////            for line in lines {
+////                let lineDataPoints = line.components(separatedBy: ",")
+////
+////                let dataPoint = lineDataPoints[symbolIndex].filter { $0.isNumber || $0 == "." || $0 == "-"}
+////
+////                guard let dataPoint = Double(dataPoint) else { return nil }
+////
+////                streamDataPoints.append(dataPoint)
+////            }
+//
+//            let stream = Stream(electrode: electrode, samples: samples)
+//
+//            streams.append(stream)
+//        }
+//
+//        return streams
     }
     static func events(from csv: String, sampleRate: Double, sampleCount: Int) -> [Event]? {
         var events: [Event] = []

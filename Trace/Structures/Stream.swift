@@ -90,16 +90,9 @@ struct Stream: Identifiable, Codable, Hashable {
     ) -> Path {
         
         let maxAbsolutePotential = max(abs(globalPotentialRange.lowerBound), abs(globalPotentialRange.upperBound))
-    
         let rowHeight: CGFloat = (plotSize.height * (1 - verticalPaddingProportion)) / Double(rowCount)
-        
         let minY = (plotSize.height * verticalPaddingProportion / 2) + rowHeight * CGFloat(rowIndex)
-        
-        
         let xStep = plotSize.width / CGFloat(plottingWindowSize - 1)
-        
-        print(xStep)
-        
         let sampleIndexRange = (firstSampleIndex...(firstSampleIndex + plottingWindowSize - 1))
         
         let points: [CGPoint] = sampleIndexRange.enumerated().compactMap { index, sampleIndex in
@@ -111,7 +104,7 @@ struct Stream: Identifiable, Codable, Hashable {
             
             let absolutePotential = abs(potential)
             let sign = potential / absolutePotential * -1
-            let distanceFromEquilibrium = (potential / maxAbsolutePotential) * (rowHeight / 2)
+            let distanceFromEquilibrium = (absolutePotential / maxAbsolutePotential) * (rowHeight / 2)
             
             let y = (minY + rowHeight / 2) + (sign * distanceFromEquilibrium)
             

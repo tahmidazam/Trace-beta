@@ -59,22 +59,31 @@ struct PlotDetailView: View {
                     }
                     .padding(.vertical)
                     
+//                    Divider()
+//
+//                    LabeledContent {
+//                        Stepper("\(plottingState.pointsPerCGPoint)", value: $plottingState.pointsPerCGPoint, in: 1...200, step: 1)
+//                            .fixedSize(horizontal: true, vertical: false)
+//                    } label: {
+//                        Text("Resolution")
+//                        Text("The number of samples plot per pixel")
+//                            .frame(maxWidth: .infinity, alignment: .leading)
+//                    }
+//                    .padding(.vertical)
+                    
                     Divider()
                     
-                    LabeledContent {
-                        Stepper("\(plottingState.pointsPerCGPoint)", value: $plottingState.pointsPerCGPoint, in: 1...200, step: 1)
-                            .fixedSize(horizontal: true, vertical: false)
-                    } label: {
-                        Text("Resolution")
-                        Text("The number of samples plot per pixel")
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    Toggle(isOn: $plottingState.colorLinePlot) {
+                        Text("Color plot")
+                        Text("Color plot according to magnitude of sample")
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical)
                     
                     Divider()
                     
                     LabeledContent {
-                        Stepper("\(plottingState.lineWidth)", value: $plottingState.lineWidth, in: 1.0...5.0, step: 0.5)
+                        Stepper("\(plottingState.lineWidth, format: .number)", value: $plottingState.lineWidth, in: 1.0...5.0, step: 0.5)
                             .frame(maxWidth: .infinity, alignment: .trailing)
                     } label: {
                         Text("Plot line width")

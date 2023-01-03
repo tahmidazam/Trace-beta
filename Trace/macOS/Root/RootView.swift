@@ -58,6 +58,17 @@ struct RootView: View {
                         
                         return lhs.electrode.prefix.rawValue < rhs.electrode.prefix.rawValue
                     })
+                    
+                    let allSamples = newValue.map { stream in
+                        return stream.samples
+                    }.flatMap({ (element: [Double]) -> [Double] in
+                        return element
+                    })
+
+                    guard let min = allSamples.min() else { return }
+                    guard let max = allSamples.max() else { return }
+                    
+                    plottingState.visiblePotentialRange = min...max
                 }
                 .sheet(item: $sheetPresented) { sheet in
                     switch sheet {

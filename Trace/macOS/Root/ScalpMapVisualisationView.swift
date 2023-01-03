@@ -28,6 +28,7 @@ struct ScalpMapVisualisationView: View {
                 electrodeLabels
             }
             .padding(50)
+            .background(Color("PlotBackground"))
             
             Divider()
             

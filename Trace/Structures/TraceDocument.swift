@@ -42,16 +42,18 @@ struct TraceDocument: FileDocument {
             throw CocoaError(.fileReadCorruptFile)
         }
         
-        let compressedContents = try JSONDecoder().decode(CompressedTraceDocumentContents.self, from: data)
+        let compressedContents = try JSONDecoder().decode(TraceDocumentContents.self, from: data)
         
-        contents = compressedContents.uncompressed()
+        contents = compressedContents
     }
     
     /// Wraps the compressed trace document structure to a file.
     /// - Parameter configuration: The configuration for writing the trace document.
     /// - Returns: A file wrapper of the trace document's data.
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        let data = try JSONEncoder().encode(CompressedTraceDocumentContents(from: contents))
+        let encoder = JSONEncoder()
+        
+        let data = try encoder.encode(contents)
         
         return .init(regularFileWithContents: data)
     }

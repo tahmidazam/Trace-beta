@@ -29,6 +29,23 @@ struct OnboardingView: View {
 
     var body: some View {
         VStack {
+            onboarding
+        }
+        .frame(maxWidth: 400)
+        .padding()
+        .fileImporter(isPresented: $showCSVFileImporter, allowedContentTypes: [.commaSeparatedText, .text], allowsMultipleSelection: false) { result in
+            switch result {
+            case .success(let urls):
+                processFile(urls: urls)
+            case .failure(_):
+                alert = .fileImportFailure
+            }
+        }
+        .alert(item: $alert, content: { alert in alert.alert })
+    }
+    
+    var onboarding: some View {
+        VStack {
             Text("Get started by importing EEG data into your Trace project")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .font(.title3.bold())
@@ -52,17 +69,6 @@ struct OnboardingView: View {
                 .controlSize(.large)
                 .padding(.top)
         }
-        .frame(maxWidth: 400)
-        .padding()
-        .fileImporter(isPresented: $showCSVFileImporter, allowedContentTypes: [.commaSeparatedText, .text], allowsMultipleSelection: false) { result in
-            switch result {
-            case .success(let urls):
-                processFile(urls: urls)
-            case .failure(_):
-                alert = .fileImportFailure
-            }
-        }
-        .alert(item: $alert, content: { alert in alert.alert })
     }
     
     var addFromCSVButton: some View {
@@ -76,8 +82,9 @@ struct OnboardingView: View {
     
     func processFile(urls: [URL]) {
         guard let url = urls.first else { alert = .fileImportFailure; return }
-        guard let rawText = try? String(contentsOf: url) else { alert = .fileImportFailure; return }
-        guard let streams = TraceDocumentContents.streams(from: rawText) else {  alert = .csvFormatInvalid; return }
+        guard let fileContents = try? String(contentsOf: url) else { alert = .fileImportFailure; return }
+        
+        guard let streams = TraceDocumentContents.streams(from: fileContents) else {  alert = .csvFormatInvalid; return }
         
         doc.contents.streams = streams
         

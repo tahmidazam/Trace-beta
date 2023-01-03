@@ -23,9 +23,12 @@ class PlottingState: ObservableObject {
     
     @Published var showEpochs: Bool = true
     @Published var epochFillOpacity: CGFloat = 0.025
+    @Published var colorLinePlot: Bool = true
     @Published var showElectrodeLabels: Bool = true
     @Published var showElectrodePotentials: Bool = true
     @Published var lineWidth: CGFloat = 1.0
+    
+    @Published var visiblePotentialRange: ClosedRange<Double> = 0...0
 
     #if os(macOS)
     @State var mouseLocation: NSPoint? = nil
