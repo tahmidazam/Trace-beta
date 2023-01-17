@@ -104,7 +104,17 @@ extension Double {
         let formattedValue = formatter.string(from: number)!
         return formattedValue
     }
+    
+    func formatDuration() -> String {
+        let interval = TimeInterval(self)
+        let ms = Int(interval.truncatingRemainder(dividingBy: 1) * 1000)
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        return formatter.string(from: interval)! + ".\(ms)"
+    }
 }
+
+
 
 #if os(macOS)
 extension View {

@@ -26,6 +26,7 @@
 		C6814236295F4D07005EA88D /* PlottingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6814235295F4D07005EA88D /* PlottingState.swift */; };
 		C69999092950F67800B00C36 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69999082950F67800B00C36 /* Renderer.swift */; };
 		C69DB9CC29454355006C52FA /* EventsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69DB9CB29454355006C52FA /* EventsView.swift */; };
+		C69EC5E92975E7BA0067F872 /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C69EC5E82975E7BA0067F872 /* Timeline.swift */; };
 		C6B8BA8A28944CA000473F34 /* DocumentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8928944CA000473F34 /* DocumentView.swift */; };
 		C6B8BA8C289471C300473F34 /* StreamDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8B289471C300473F34 /* StreamDetailView.swift */; };
 		C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */; };
@@ -82,6 +83,7 @@
 		C6814235295F4D07005EA88D /* PlottingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlottingState.swift; sourceTree = "<group>"; };
 		C69999082950F67800B00C36 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
 		C69DB9CB29454355006C52FA /* EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsView.swift; sourceTree = "<group>"; };
+		C69EC5E82975E7BA0067F872 /* Timeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timeline.swift; sourceTree = "<group>"; };
 		C6B8BA8928944CA000473F34 /* DocumentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentView.swift; sourceTree = "<group>"; };
 		C6B8BA8B289471C300473F34 /* StreamDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamDetailView.swift; sourceTree = "<group>"; };
 		C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPreferencesView.swift; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				C6DC5BA22874B795007B679C /* TraceApp.swift */,
 				C69999082950F67800B00C36 /* Renderer.swift */,
 				C6B8BA8928944CA000473F34 /* DocumentView.swift */,
+				C69EC5E82975E7BA0067F872 /* Timeline.swift */,
 				C6CE2B2D2932C65200E0DD61 /* macOS */,
 				C6B8BA8D2894735F00473F34 /* DocumentPreferencesView.swift */,
 				C6B8BA9128947EC300473F34 /* ChartView.swift */,
@@ -383,6 +386,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C69EC5E92975E7BA0067F872 /* Timeline.swift in Sources */,
 				C6B8BA8E2894735F00473F34 /* DocumentPreferencesView.swift in Sources */,
 				C6814236295F4D07005EA88D /* PlottingState.swift in Sources */,
 				C63DACCE2959F90F0013EBCF /* StreamsDetailView.swift in Sources */,

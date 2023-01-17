@@ -34,7 +34,8 @@ struct StackedPlotView: View {
             Divider()
             
             VStack {
-                TimelineView(doc: $doc, plottingState: plottingState)
+//                TimelineView(doc: $doc, plottingState: plottingState)
+                Timeline(doc: $doc, plottingState: plottingState)
                 
                 stackedPlotBottomBar
             }
@@ -230,7 +231,7 @@ struct StackedPlotView: View {
                 }
                 
                 HStack(alignment: .firstTextBaseline, spacing: 0.0) {
-                    Text("\(doc.contents.time(at: plottingState.windowStartIndex).format())")
+                    Text("\(doc.contents.time(at: plottingState.windowStartIndex).formatDuration())")
                         .font(.system(.body, design: .monospaced))
                     
                     Text(" s")
@@ -252,7 +253,7 @@ struct StackedPlotView: View {
                 }
                 
                 HStack(alignment: .firstTextBaseline, spacing: 0.0) {
-                    Text("\(doc.contents.time(at: plottingState.windowStartIndex + plottingState.windowSize).format())")
+                    Text("\(doc.contents.time(at: plottingState.windowStartIndex + plottingState.windowSize).formatDuration())")
                         .font(.system(.body, design: .monospaced))
                     
                     Text(" s")
