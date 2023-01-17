@@ -161,5 +161,10 @@ struct Timeline: View {
             .animation(.easeInOut, value: scale)
         }
         .frame(height: 10)
+        .onChange(of: plottingState.windowStartIndex) { newValue in
+            if !dragState.isActive {
+                progressState = CGFloat(newValue) / CGFloat(sampleCount - plottingState.windowSize - 1)
+            }
+        }
     }
 }
