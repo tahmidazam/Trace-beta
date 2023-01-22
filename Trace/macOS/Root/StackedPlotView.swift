@@ -16,9 +16,23 @@ struct StackedPlotView: View {
     var timeRange: ClosedRange<Double>
     var sampleRange: ClosedRange<Int>
     
-    @State var offset = CGSize.zero
+    @GestureState var magnifyBy: CGFloat = 1.0
+    @GestureState var dragAmount = CGSize.zero
     
-    #if os(macOS)
+    var magnification: some Gesture {
+        MagnificationGesture()
+            .updating($magnifyBy) { currentState, gestureState, transaction in
+                withAnimation {
+                    gestureState = currentState
+                }
+            }
+    }
+    var drag: some Gesture {
+        DragGesture().updating($dragAmount) { value, state, transaction in
+            state = value.translation
+        }
+    }
+#if os(macOS)
     var body: some View {
         VStack(spacing: 0.0) {
             HStack(spacing: 0.0) {
@@ -28,13 +42,12 @@ struct StackedPlotView: View {
                 Divider()
                 
                 plot
-                    
+                
             }
             
             Divider()
             
             VStack {
-//                TimelineView(doc: $doc, plottingState: plottingState)
                 Timeline(doc: $doc, plottingState: plottingState)
                 
                 stackedPlotBottomBar
@@ -42,7 +55,7 @@ struct StackedPlotView: View {
             .padding()
         }
     }
-    #else
+#else
     var body: some View {
         VStack(spacing: 0.0) {
             Divider()
@@ -57,10 +70,14 @@ struct StackedPlotView: View {
                     plot
                 }
             }
+            .scaleEffect(magnifyBy)
+            .offset(dragAmount)
+            .gesture(SimultaneousGesture(drag, magnification))
+            .mask(Rectangle())
             
             Divider()
             
-            TimelineView(doc: $doc, plottingState: plottingState)
+            Timeline(doc: $doc, plottingState: plottingState)
                 .padding()
             
             Divider()
@@ -71,8 +88,8 @@ struct StackedPlotView: View {
             })
         }
     }
-    #endif
-
+#endif
+    
     var plot: some View {
         ZStack {
             GeometryReader { proxy in
@@ -107,7 +124,7 @@ struct StackedPlotView: View {
                     }
                     
                     context.stroke(eventPath, with: .color(.red), lineWidth: plottingState.lineWidth)
-
+                    
                     if plottingState.showEpochs {
                         let epochEnd = size.width * (CGFloat(doc.contents.epochLength + event.sampleIndex - plottingState.windowStartIndex + 1) / CGFloat(plottingState.windowSize))
                         
@@ -139,7 +156,7 @@ struct StackedPlotView: View {
                     }
                 }
                 
-                #if os(macOS)
+#if os(macOS)
                 if let mouseLocation = plottingState.mouseLocation {
                     let markerPathX = Path { path in
                         path.move(to: CGPoint(x: mouseLocation.x, y: 0))
@@ -152,7 +169,7 @@ struct StackedPlotView: View {
                     context.stroke(markerPathX, with: .color(.green.opacity(0.25)), lineWidth: plottingState.lineWidth)
                     context.stroke(markerPathY, with: .color(.green.opacity(0.25)), lineWidth: plottingState.lineWidth)
                 }
-                #endif
+#endif
             }
             
             if plottingState.colorLinePlot {
@@ -213,7 +230,7 @@ struct StackedPlotView: View {
             .frame(maxHeight: .infinity, alignment: .center)
         }
     }
-    #if os(macOS)
+#if os(macOS)
     var stackedPlotBottomBar: some View {
         HStack {
             previousWindow
@@ -267,7 +284,7 @@ struct StackedPlotView: View {
         }
         .disabled(plottingState.visualisation != PlottingState.Visualisation.stackedPlot)
     }
-    #else
+#else
     var stackedPlotBottomBar: some View {
         HStack {
             previousWindow
@@ -287,7 +304,7 @@ struct StackedPlotView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 0.0) {
                     Text("\(doc.contents.time(at: plottingState.windowStartIndex).format())")
                         .font(.system(.caption, design: .monospaced))
-
+                    
                     Text(" s")
                         .font(.caption)
                 }
@@ -323,7 +340,7 @@ struct StackedPlotView: View {
         }
         .disabled(plottingState.visualisation != PlottingState.Visualisation.stackedPlot)
     }
-    #endif
+#endif
     
     var previousWindow: some View {
         Button(action: {
