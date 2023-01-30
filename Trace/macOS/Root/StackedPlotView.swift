@@ -15,6 +15,9 @@ struct StackedPlotView: View {
     var potentialRange: ClosedRange<Double>
     var timeRange: ClosedRange<Double>
     var sampleRange: ClosedRange<Int>
+    var bound: Double {
+        max(abs(plottingState.visiblePotentialRange.upperBound), abs(plottingState.visiblePotentialRange.lowerBound))
+    }
     
     @GestureState var magnifyBy: CGFloat = 1.0
     @GestureState var dragAmount = CGSize.zero
@@ -34,32 +37,34 @@ struct StackedPlotView: View {
     }
 #if os(macOS)
     var body: some View {
-        VStack(spacing: 0.0) {
-            HStack(spacing: 0.0) {
-                streamSidebar
-                    .frame(width: 50)
+        if plottingState.selectedStreams.isEmpty {
+            noStreamsSelectedView
+        } else {
+            VStack(spacing: 0.0) {
+                HStack(spacing: 0.0) {
+                    streamSidebar
+                        .frame(width: 50)
+                    Divider()
+                    plot
+                    
+                    Divider()
+                }
                 
                 Divider()
                 
-                plot
-                
+                VStack {
+                    Timeline(doc: $doc, plottingState: plottingState)
+                    
+                    stackedPlotBottomBar
+                }
+                .padding()
             }
-            
-            Divider()
-            
-            VStack {
-                Timeline(doc: $doc, plottingState: plottingState)
-                
-                stackedPlotBottomBar
-            }
-            .padding()
         }
     }
 #else
     var body: some View {
         VStack(spacing: 0.0) {
             Divider()
-            
             HStack(spacing: 0.0) {
                 streamSidebar
                     .frame(width: 50)
@@ -76,7 +81,7 @@ struct StackedPlotView: View {
             .mask(Rectangle())
             
             Divider()
-            
+        
             Timeline(doc: $doc, plottingState: plottingState)
                 .padding()
             
@@ -103,7 +108,6 @@ struct StackedPlotView: View {
                         .position(x: x, y: y)
                 }
             }
-            
             Canvas { context, size in
                 let eventsToDraw = doc.contents.events.filter { event in
                     guard plottingState.selectedEventTypes.contains(event.type) else {
@@ -114,7 +118,6 @@ struct StackedPlotView: View {
                     
                     return epochRange.contains(plottingState.windowStartIndex) || sampleRange.contains(epochRange.lowerBound) || sampleRange.contains(epochRange.upperBound)
                 }
-                
                 for event in eventsToDraw {
                     let x = size.width * (CGFloat(event.sampleIndex - plottingState.windowStartIndex + 1) / CGFloat(plottingState.windowSize))
                     
@@ -144,7 +147,6 @@ struct StackedPlotView: View {
                         context.stroke(eventEndPath, with: .color(.red), style: StrokeStyle(lineWidth: plottingState.lineWidth, dash: [5]))
                     }
                 }
-                
                 if let marker = plottingState.marker {
                     if sampleRange.contains(marker) {
                         let x = size.width * (CGFloat(marker - plottingState.windowStartIndex + 1) / CGFloat(plottingState.windowSize))
@@ -155,7 +157,6 @@ struct StackedPlotView: View {
                         context.stroke(markerPath, with: .color(.green), lineWidth: plottingState.lineWidth)
                     }
                 }
-                
 #if os(macOS)
                 if let mouseLocation = plottingState.mouseLocation {
                     let markerPathX = Path { path in
@@ -171,7 +172,6 @@ struct StackedPlotView: View {
                 }
 #endif
             }
-            
             if plottingState.colorLinePlot {
                 ZStack {
                     GeometryReader { proxy in
@@ -179,7 +179,7 @@ struct StackedPlotView: View {
                             let rowHeight: CGFloat = (proxy.size.height * (1 - PlottingState.verticalPaddingProportion)) / Double(plottingState.selectedStreams.count)
                             
                             ForEach(plottingState.selectedStreams.indices, id: \.self) { _ in
-                                LinearGradient(colors: [.red, .yellow, .green, .green, .cyan, .blue], startPoint: .top, endPoint: .bottom)
+                                LinearGradient(colors: [.red, .yellow, .green, .cyan, .blue], startPoint: .top, endPoint: .bottom)
                                     .frame(height: rowHeight)
                                     .frame(maxWidth: .infinity)
                             }
@@ -229,6 +229,12 @@ struct StackedPlotView: View {
             .frame(height: proxy.size.height * (1 - PlottingState.verticalPaddingProportion))
             .frame(maxHeight: .infinity, alignment: .center)
         }
+    }
+    var noStreamsSelectedView: some View {
+        Text("No streams selected")
+            .font(.title3)
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 #if os(macOS)
     var stackedPlotBottomBar: some View {
